@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+  $(function() {
+    // signed Everywhere Events query, parameters can't be altered:
+    var ev_query = 'http://api.meetup.com/ew/events?status=upcoming&radius=25.0&order=time&offset=0&page=200&container_id=15&sig_id=7230113&sig=1fd766fc48778554453923503b36644e&callback=?';
+    // example query using a key of XXX:
+    // var ev_query = 'http://api.meetup.com/ew/events?status=upcoming&container_id=15&callback=?&key=XXX'
+    var map = new google.maps.Map(document.getElementById("map_canvas"), {
+      zoom: 2,
+      center: new google.maps.LatLng(0,0),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    $.getJSON(ev_query, function(data) {
+      if (data.status && data.status.match(/^200/) == null) {
+        alert(data.status + ": " + data.details);
+      } else {
+        $.each(data.results, function(i, ev) {
+          var marker = new google.maps.Marker({
+              position: new google.maps.LatLng(ev.lat, ev.lon), 
+              map: map, 
+          });
+          google.maps.event.addListener(marker, 'click', function() {
+            var link = '<h3><a href="' + ev.meetup_url + '">' + ('title' in ev ? ev.title : ev.container.name) + '</a></h3>';
+            var city = '<p>' + ev.city + '</p>';
+            var win = new google.maps.InfoWindow({
+              content: link + city
+            });
+            win.open(map, marker);
+          });
+        });
+      }
+    });
+  });
+</script>
+</head>
+<body>
+  <div id="map_canvas" style="width:100%; height:100%"></div>
+</body>
+</html>
