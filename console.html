@@ -1,0 +1,36 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script>
+  $(function() {
+    $('#exe').click(function() {
+      var url = 'http://api.meetup.com/' + $("#req").val() + '&sign=true&callback=?';
+      $.getJSON(url, function(data) {
+        if (data.status && data.status.match(/^200/) == null) {
+          alert(data.status + ": " + data.details);
+        } else {
+          var target = $('#results');
+          target.empty();
+          target.append($('<code/>').append(data.meta.signed_url));
+          var table = $('<table/>');
+          $.each(data.results, function(i, item) {
+              var tr = $('<tr/>');
+              for (key in item) {
+                tr.append($('<td/>').append(item[key]));
+              }
+              table.append(tr);
+          });
+          target.append(table);
+        }
+      });
+      return false;
+    });
+  });
+</script>
+<body>
+  <form>
+  <p><code>http://api.meetup.com/</code><input type="text" id="req" style="width: 30em"></p>
+  <p><input type="submit" value="Execute" id="exe"></p>
+  <div id="results" />
+</body>
+</html>
