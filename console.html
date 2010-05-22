@@ -4,32 +4,61 @@
 <script>
   $(function() {
     $('#exe').click(function() {
-      var url = 'http://api.meetup.com/' + $("#req").val() + '&sign=true&callback=?';
+      var url = 'http://api.meetup.com/' + $("#req").val() + '&key=' + $("#key").val() + '&sign=true&callback=?';
       $.getJSON(url, function(data) {
         if (data.status && data.status.match(/^200/) == null) {
           alert(data.status + ": " + data.details);
         } else {
           var target = $('#results');
           target.empty();
-          target.append($('<code/>').append(data.meta.signed_url));
-          var table = $('<table/>');
-          $.each(data.results, function(i, item) {
-              var tr = $('<tr/>');
-              for (key in item) {
-                tr.append($('<td/>').append(item[key]));
-              }
-              table.append(tr);
-          });
-          target.append(table);
+          target.append($('<code/>').append(data.meta.signed_url.replace(/&callback=[^&]+/, '')));
+          target.append($('<pre/>').append(DumpObjectIndented(data.results, "  ")))
         }
       });
       return false;
     });
   });
+  // http://stackoverflow.com/questions/130404/javascript-data-formatting-pretty-printer/130504#130504
+  function DumpObjectIndented(obj, indent)
+  {
+    var result = "";
+    if (indent == null) indent = "";
+
+    for (var property in obj)
+    {
+      var value = obj[property];
+      if (typeof value == 'string')
+        value = "'" + value + "'";
+      else if (typeof value == 'object')
+      {
+        if (value instanceof Array)
+        {
+          // Just let JS convert the Array to a string!
+          value = "[ " + value + " ]";
+        }
+        else
+        {
+          // Recursive dump
+          // (replace "  " by "\t" or something else if you prefer)
+          var od = DumpObjectIndented(value, indent + "  ");
+          // If you like { on the same line as the key
+          //value = "{\n" + od + "\n" + indent + "}";
+          // If you prefer { and } to be aligned
+          value = "\n" + indent + "{\n" + od + "\n" + indent + "}";
+        }
+      }
+      result += indent + "'" + property + "' : " + value + ",\n";
+    }
+    return result.replace(/,\n$/, "");
+  }
 </script>
+<style type="text/css">
+  input.text { width: 20em; }
+  code { white-space: nowrap; }
+</style>
 <body>
   <form>
-  <p><code>http://api.meetup.com/</code><input type="text" id="req" style="width: 30em"></p>
+  <p><code>http://api.meetup.com/<input class="text" type="text" id="req">&key=<input class="text" id="key"></span></code></p>
   <p><input type="submit" value="Execute" id="exe"></p>
   <div id="results" />
 </body>
