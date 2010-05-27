@@ -1,11 +1,10 @@
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script>
   $(function() {
     $('#exe').click(function() {
-      var url = 'http://api.meetup.com/' + $("#req").val() + '&key=' + $("#key").val() + '&sign=true&callback=?';
-      $.getJSON(url, function(data) {
+      $.getJSON(get_url(), function(data) {
         if (data.status && data.status.match(/^200/) == null) {
           alert(data.status + ": " + data.details);
         } else {
@@ -17,7 +16,45 @@
       });
       return false;
     });
+    append_select({
+      events: {},
+      groups: {},
+      ew: {
+        containers: {},
+        events: {}
+      },
+      2: {
+        events: {},
+        profiles: {}
+      }
+    }, 0);
   });
+  function get_url() {
+    return 'http://api.meetup.com/' + 
+      $("#selectors :selected").map(function(i, e) {
+        return $(e).val();
+      }).get().join('/') + '?' +
+      $("#req").val() +
+      '&key=' + $("#key").val() + 
+      '&sign=true&callback=?'
+  }
+  function append_select(methods, depth) {
+    if ($.isEmptyObject(methods)) return;
+    var select = $('<select/>');
+    for (method in methods) {
+      var option = $('<option>' + method + '</option>');
+      option.data(methods[method]);
+      select.append(option);
+    }
+    $('#selectors').append(select);
+    for (var i=0; i <= depth; i++) {
+      select.addClass('depth_'+i);
+    }
+    select.change(function() {
+      $('#selectors .depth_'+(depth+1)).remove();
+      append_select(select.children(":selected").data(), depth+1);
+    }).change();
+  }
   // http://stackoverflow.com/questions/130404/javascript-data-formatting-pretty-printer/130504#130504
   function DumpObjectIndented(obj, indent)
   {
@@ -58,8 +95,8 @@
 </style>
 <body>
   <form>
-  <p><code>http://api.meetup.com/<input class="text" type="text" id="req">&key=<input class="text" id="key"></span></code></p>
+  <p><code>http://api.meetup.com/<span id="selectors"></span>?<input class="text" type="text" id="req">&key=<input class="text" id="key"></code></p>
   <p><input type="submit" value="Execute" id="exe"></p>
-  <div id="results" />
+  <div id="results"></div>
 </body>
 </html>
