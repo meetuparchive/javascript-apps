@@ -7,12 +7,13 @@
   $(function() {
     var width = 530;
     var height = 300;
-    var ifrm = $('<iframe style="width: 530px; height: 300px; border: 0" frameborder="no" />');
+    var ifrm = $('<iframe style="width: 520px; height: 300px; border: 0" frameborder="no" />');
     $('#merged-map').html(ifrm);
     setTimeout(function() {
       var ifrm_doc = ifrm[0].contentWindow.document;
       var map_canvas = $('<div style="width: 100%; height: 100%"></div>');
-      $('body', ifrm_doc).html(map_canvas);
+      var body = $('body', ifrm_doc).attr('style', 'margin: 0');
+      body.html(map_canvas);
 
       var map = new google.maps.Map(map_canvas[0], {
         zoom: 1,
@@ -27,7 +28,7 @@
       // signed events v2 topic query, can't be altered:
       var gr_query = 'http://api.meetup.com/2/events?radius=25.0&topic=scala&offset=0&format=json&page=200&after=0d&sig_id=7230113&sig=cecfef2bea83dd193511408f6015c259&callback=?';
       with_each(gr_query, function(i, ev) {
-        var loc = typeof ev.venue == 'undefined' ? ev : ev.venue
+        var loc = typeof ev.venue == 'undefined' ? ev : ev.venue;
         pin(loc, ev.group.name, ev.time, ev.event_url);
       });
 
@@ -48,8 +49,8 @@
         });
         google.maps.event.addListener(marker, 'click', function() {
           if (open_win != null) open_win.close();
-          var heading = '<h3>' + title + '</h3>';
-          var link = '<p><a href="' + url + '">Meeting up in ' + countdown(time) + ' days</a></p>';
+          var heading = '<div style="font-weight: bold">' + title + '</div>';
+          var link = '<div><a target="_top" href="' + url + '">Meeting up in ' + countdown(time) + ' days</a></div>';
           var win = new google.maps.InfoWindow({
             content: heading + link
           });
@@ -61,7 +62,7 @@
   });
 
   function countdown(millis) {
-    return  Math.floor((millis - (new Date()).getTime()) / 86400000)
+    return  Math.floor((millis - (new Date()).getTime()) / 86400000);
   }
     
 </script>
