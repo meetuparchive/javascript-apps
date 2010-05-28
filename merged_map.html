@@ -5,60 +5,68 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script>
   $(function() {
-    var map = new google.maps.Map(document.getElementById("map_canvas"), {
-      zoom: 2,
-      center: new google.maps.LatLng(0,0),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-    // signed Everywhere Events query, parameters can't be altered:
-    var ew_query = 'http://api.meetup.com/ew/events?status=upcoming%2Cpast&radius=25.0&order=time&urlname=scala&offset=0&format=json&page=200&sig_id=7230113&sig=b700c95ce6c104f7df51527056bd0e72&callback=?';
-    $.getJSON(ew_query, function(data) {
-      if (data.status && data.status.match(/^200/) == null) {
-        alert(data.status + ": " + data.details);
-      } else {
-        $.each(data.results, function(i, ev) {
-          pin(ev, ev.city + ' Scala Meetup', ev.time, ev.meetup_url);
+    var width = 530;
+    var height = 300;
+    var ifrm = $('<iframe style="width: 530px; height: 300px; border: 0" frameborder="no" />');
+    $('#merged-map').html(ifrm);
+    setTimeout(function() {
+      var ifrm_doc = ifrm[0].contentWindow.document;
+      var map_canvas = $('<div style="width: 100%; height: 100%"></div>');
+      $('body', ifrm_doc).html(map_canvas);
+
+      var map = new google.maps.Map(map_canvas[0], {
+        zoom: 1,
+        center: new google.maps.LatLng(0,0),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+      // signed Everywhere Events query, parameters can't be altered:
+      var ew_query = 'http://api.meetup.com/ew/events?status=upcoming%2Cpast&radius=25.0&order=time&urlname=scala&offset=0&format=json&page=200&sig_id=7230113&sig=b700c95ce6c104f7df51527056bd0e72&callback=?';
+      with_each(ew_query, function(i, ev) {
+        pin(ev, ev.city + ' Scala Meetup', ev.time, ev.meetup_url);
+      });
+      // signed events v2 topic query, can't be altered:
+      var gr_query = 'http://api.meetup.com/2/events?radius=25.0&topic=scala&offset=0&format=json&page=200&after=0d&sig_id=7230113&sig=cecfef2bea83dd193511408f6015c259&callback=?';
+      with_each(gr_query, function(i, ev) {
+        var loc = typeof ev.venue == 'undefined' ? ev : ev.venue
+        pin(loc, ev.group.name, ev.time, ev.event_url);
+      });
+
+      open_win = null;
+      function with_each(query, draw) {
+        $.getJSON(query, function(data) {
+          if (data.status && data.status.match(/^200/) == null) {
+            alert(data.status + ": " + data.details);
+          } else {
+            $.each(data.results, draw);
+          }
         });
       }
-    });
-    // signed events v2 topic query, can't be altered:
-    var gr_query = 'http://api.meetup.com/2/events?radius=25.0&topic=scala&offset=0&format=json&page=200&after=0d&sig_id=7230113&sig=cecfef2bea83dd193511408f6015c259&callback=?';
-    $.getJSON(gr_query, function(data) {
-      if (data.status && data.status.match(/^200/) == null) {
-        alert(data.status + ": " + data.details);
-      } else {
-        
-        $.each(data.results, function(i, ev) {
-          var loc = typeof ev.venue == 'undefined' ? ev : ev.venue
-          pin(loc, ev.group.name, ev.time, ev.event_url);
+      function pin(loc, title, time, url) {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(loc.lat, loc.lon), 
+            map: map, 
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+          if (open_win != null) open_win.close();
+          var heading = '<h3>' + title + '</h3>';
+          var link = '<p><a href="' + url + '">Meeting up in ' + countdown(time) + ' days</a></p>';
+          var win = new google.maps.InfoWindow({
+            content: heading + link
+          });
+          win.open(map, marker);
+          open_win = win;
         });
       }
-    });
-    open_win = null;
-    function pin(loc, title, time, url) {
-      var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(loc.lat, loc.lon), 
-          map: map, 
-      });
-      google.maps.event.addListener(marker, 'click', function() {
-        if (open_win != null) open_win.close();
-        var heading = '<h3>' + title + '</h3>';
-        var link = '<p><a href="' + url + '">Meeting up in ' + countdown(time) + ' days</a></p>';
-        var win = new google.maps.InfoWindow({
-          content: heading + link
-        });
-        win.open(map, marker);
-        open_win = win;
-      });
-    }
+    }, 1);
   });
 
   function countdown(millis) {
     return  Math.floor((millis - (new Date()).getTime()) / 86400000)
   }
+    
 </script>
 </head>
 <body>
-  <div id="map_canvas" style="width:100%; height:100%"></div>
+  <div id="merged-map"></div>
 </body>
 </html>
