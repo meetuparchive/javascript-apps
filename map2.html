@@ -16,7 +16,7 @@
       			mapTypeId: google.maps.MapTypeId.ROADMAP
     		});
 		
-        	var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val() +'&order=ctime&desc=true&key=2b2b21f3a32d2a5b4c6d3c8015746&callback=?';
+        	var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val() +'&order=ctime&desc=true&key=xxx&callback=?';
     		// example query using a key of XXX:
     		// var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val() +'&order=ctime&desc=true&key=XXX&callback=?';
 		$.getJSON(ev_query, function(data) {
@@ -25,9 +25,7 @@
 			} else {
         			$.each(data.results, function(i, ev) {
 					point = new google.maps.LatLng(ev.lat, ev.lon);
-
 					bounds.extend(point);
-        			
 					var marker = new google.maps.Marker({ 
 						position: new google.maps.LatLng(ev.lat, ev.lon), map: map, 
 					});
@@ -47,11 +45,6 @@
 		map.fitBounds(bounds);
 	};
 
-	function setCookie(c_name,value,expiredays){
-		var exdate=new Date();
-		exdate.setDate(exdate.getDate()+expiredays);
-		document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
-	}
 </script>
 </head>
 <body>
