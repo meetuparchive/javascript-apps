@@ -46,6 +46,7 @@
         var marker = new google.maps.Marker({
             position: new google.maps.LatLng(loc.lat, loc.lon), 
             map: map, 
+	    title: title,
         });
         google.maps.event.addListener(marker, 'click', function() {
           if (open_win != null) open_win.close();
