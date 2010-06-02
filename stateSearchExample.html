@@ -3,6 +3,7 @@
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="saveApiKey.js"></script>
 <script>
   $(function() {
 
@@ -10,7 +11,7 @@
     var target = $('#results');
     var entry = $('#state');
 
-    document.getElementById('apikey').value = getCookie('myApiKey')
+    document.getElementById('apikey').value = getAPIcookie();
 
 $('#exe').click(function() {
 
@@ -22,7 +23,7 @@ $('#exe').click(function() {
         alert(data.status + ": " + data.details);
       } else {
 	
-	checkAddCookie(key.val());
+	checkAddCookie(key.val(),document.f.yn[0].checked);
         $.each(data.results, function(i, ev) {
 
 		output = ev.city + " - " + ev.members + " Members" + "<br>";
@@ -41,39 +42,6 @@ function appendQuery(state, apiKey) {
 	return "http://api.meetup.com/cities.json/?state=" + state + "&key=" + apiKey + "&callback=?";
 }
 
-function checkAddCookie(apiKey) {
-	if(document.f.yn[0].checked) {
-		//remember
-		setCookie('myApiKey',apiKey,365);
-	}
-	else {
-		//Dont remember
-	}
-}
-
-function setCookie(c_name,value,expiredays)
-{
-	var exdate=new Date();
-	exdate.setDate(exdate.getDate()+expiredays);
-	document.cookie=c_name+ "=" +escape(value)+
-	((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
-}
-
-function getCookie(c_name)
-{
-	if (document.cookie.length>0)
-	{
- 		 c_start=document.cookie.indexOf(c_name + "=");
- 		 if (c_start!=-1)
-   		 {
-    			 c_start=c_start + c_name.length+1;
-    			 c_end=document.cookie.indexOf(";",c_start);
-    			 if (c_end==-1) c_end=document.cookie.length;
-    				return unescape(document.cookie.substring(c_start,c_end));
-   	 	 }
-  	}
-	return "";
-}
 
 </script>
 </head>
