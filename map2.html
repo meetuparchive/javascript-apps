@@ -5,40 +5,46 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script>
   	function find_close_groups() {
-    // signed Everywhere Events query, parameters can't be altered:
- 		var target = $('#results');
-		var text = $('#zipcode');
+
+		var zip = $('#zipcode');
+		var dist = $('#distance');
+		var point
+		var bounds = new google.maps.LatLngBounds();
 		var map = new google.maps.Map(document.getElementById("map_canvas"), {
-      			zoom: 6,
+      			zoom: 15,
       			center: new google.maps.LatLng(0,0),
       			mapTypeId: google.maps.MapTypeId.ROADMAP
     		});
-		alert(text.val());
-		alert(target);
-        	var ev_query = 'http://api.meetup.com/groups.json/?zip=' + text.val() + '&order=ctime&desc=true&key=2b2b21f3a32d2a5b4c6d3c8015746&callback=?';
+		
+        	var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val() +'&order=ctime&desc=true&key=2b2b21f3a32d2a5b4c6d3c8015746&callback=?';
     		// example query using a key of XXX:
-    		// var ev_query = 'http://api.meetup.com/ew/events?status=upcoming&container_id=15&callback=?&key=XXX'
+    		// var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val() +'&order=ctime&desc=true&key=XXX&callback=?';
 		$.getJSON(ev_query, function(data) {
 			if (data.status && data.status.match(/^200/) == null) {
 				alert(data.status + ": " + data.details);
 			} else {
         			$.each(data.results, function(i, ev) {
-        				//target.append(ev.city);
-					//target.append("<br>");
+					point = new google.maps.LatLng(ev.lat, ev.lon);
+
+					bounds.extend(point);
+        			
 					var marker = new google.maps.Marker({ 
 						position: new google.maps.LatLng(ev.lat, ev.lon), map: map, 
 					});
+				
         		  		google.maps.event.addListener(marker, 'click', function() {
-	        	    			var link = '<h3><a href="' + ev.meetup_url + '">' + ('title' in ev ? ev.title : ev.container.name) + '</a></h3>';
+	        	    			var link = '<h3><a href="http://www.meetup.com/' + ev.group_urlname + '">' + ev.name + '</a></h3>';
 	        	    			var city = '<p>' + ev.city + '</p>';
 	       		     			var win = new google.maps.InfoWindow({
 	        	      				content: link + city
 	        	    			});
         	    				win.open(map, marker);
        	   				});
-       		 		}); 
+       		 		});
       			}
 		});
+
+		map.fitBounds(bounds);
 	};
 
 	function setCookie(c_name,value,expiredays){
@@ -50,7 +56,10 @@
 </head>
 <body>
 	<form>
-	<input type="text" id="zipcode" />
+	Zip Code <input type="text" id="zipcode" />
+	<br>
+	Distance <input type="text" id="distance" />
+	<br>
 	<input type="button" value="Click me!" onclick="find_close_groups()" />
 	</form>
   <div id="map_canvas" style="width:100%; height:100%"></div>
