@@ -10,13 +10,19 @@
     var target = $('#results');
     var entry = $('#state');
 
+    document.getElementById('apikey').value = getCookie('myApiKey')
+
 $('#exe').click(function() {
+
+    
+
     target.empty();
     $.getJSON(appendQuery(entry.val(), key.val()), function(data) {
       if (data.status && data.status.match(/^200/) == null) {
         alert(data.status + ": " + data.details);
       } else {
-
+	
+	checkAddCookie(key.val());
         $.each(data.results, function(i, ev) {
 
 		output = ev.city + " - " + ev.members + " Members" + "<br>";
@@ -24,6 +30,8 @@ $('#exe').click(function() {
         });
       }
     });
+
+    key.value = 'test';
 });
 
 
@@ -32,15 +40,55 @@ $('#exe').click(function() {
 function appendQuery(state, apiKey) {
 	return "http://api.meetup.com/cities.json/?state=" + state + "&key=" + apiKey + "&callback=?";
 }
+
+function checkAddCookie(apiKey) {
+	if(document.f.yn[0].checked) {
+		//remember
+		setCookie('myApiKey',apiKey,365);
+	}
+	else {
+		//Dont remember
+	}
+}
+
+function setCookie(c_name,value,expiredays)
+{
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate()+expiredays);
+	document.cookie=c_name+ "=" +escape(value)+
+	((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
+}
+
+function getCookie(c_name)
+{
+	if (document.cookie.length>0)
+	{
+ 		 c_start=document.cookie.indexOf(c_name + "=");
+ 		 if (c_start!=-1)
+   		 {
+    			 c_start=c_start + c_name.length+1;
+    			 c_end=document.cookie.indexOf(";",c_start);
+    			 if (c_end==-1) c_end=document.cookie.length;
+    				return unescape(document.cookie.substring(c_start,c_end));
+   	 	 }
+  	}
+	return "";
+}
+
 </script>
 </head>
 <body>
 	<p>JavaScript Test</p>
 	
-
 	<p>
 	Enter your API key:
 	<input type="text" id="apikey" size="30"></input>
+	&nbsp 
+	<form name="f">
+	Remember Me? &nbsp	
+	<input type="radio" name="yn" value="yes" checked> Yes
+	<input type="radio" name="yn" value="no" > No
+	</form>
 	<br>
 	Enter the initials of the state to search:
 	<input type="text" id="state" size="3"></input>
