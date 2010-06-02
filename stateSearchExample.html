@@ -1,0 +1,71 @@
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="saveApiKey.js"></script>
+<script>
+  $(function() {
+
+    var key = $('#apikey');
+    var target = $('#results');
+    var entry = $('#state');
+
+    document.getElementById('apikey').value = getAPIcookie();
+
+$('#exe').click(function() {
+
+    
+
+    target.empty();
+    $.getJSON(appendQuery(entry.val(), key.val()), function(data) {
+      if (data.status && data.status.match(/^200/) == null) {
+        alert(data.status + ": " + data.details);
+      } else {
+	
+	checkAddCookie(key.val(),document.f.yn[0].checked);
+        $.each(data.results, function(i, ev) {
+
+		output = ev.city + " - " + ev.members + " Members" + "<br>";
+	  target.append(output);
+        });
+      }
+    });
+
+    key.value = 'test';
+});
+
+
+  });
+
+function appendQuery(state, apiKey) {
+	return "http://api.meetup.com/cities.json/?state=" + state + "&key=" + apiKey + "&callback=?";
+}
+
+
+</script>
+</head>
+<body>
+	<p>JavaScript Test</p>
+	
+	<p>
+	Enter your API key:
+	<input type="text" id="apikey" size="30"></input>
+	&nbsp 
+	<form name="f">
+	Remember Me? &nbsp	
+	<input type="radio" name="yn" value="yes" checked> Yes
+	<input type="radio" name="yn" value="no" > No
+	</form>
+	<br>
+	Enter the initials of the state to search:
+	<input type="text" id="state" size="3"></input>
+	<br>
+	<input type="submit" value="Submit" id="exe"></input>
+	</p>
+	<hr>
+	<p><div id="results"></div></p>
+
+
+</body>
+</html>
