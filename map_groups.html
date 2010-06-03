@@ -7,44 +7,49 @@
   	function find_close_groups() {
 		
 		//enter your api key
-		var api_key = '2b2b21f3a32d2a5b4c6d3c8015746';		
+		var api_key = '';		
 		
 		var zip = $('#zipcode');
 		var dist = $('#distance');
-		var search_field = $('#search');
 		var point
 		var bounds = new google.maps.LatLngBounds();
+
+		//create map
 		var map = new google.maps.Map(document.getElementById("map_canvas"), {
       			zoom: 15,
       			center: new google.maps.LatLng(0,0),
       			mapTypeId: google.maps.MapTypeId.ROADMAP
     		});
 	
-					var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&order=ctime&desc=true&key=' + api_key + '&callback=?';
-					//var ev_query = 'http://api.meetup.com/groups.json/?zip=07410&order=ctime&desc=true&key=2b2b21f3a32d2a5b4c6d3c8015746&callback=?';
-					$.getJSON(ev_query, function(data) {
-						if (data.status && data.status.match(/^200/) == null) {
-							alert(data.status + ": " + data.details);
-						} else {
-        						$.each(data.results, function(i, ev) {
-								point = new google.maps.LatLng(ev.lat, ev.lon);
-								bounds.extend(point);
-								var marker = new google.maps.Marker({ 
-									position: new google.maps.LatLng(ev.lat, ev.lon), map: map, 
-								});
-				
-        					  		google.maps.event.addListener(marker, 'click', function() {
-	        				    			var link = '<h3><a href="http://www.meetup.com/' + ev.group_urlname + '">' + ev.name + '</a></h3><img src="' +  ev.photo_url +  '" alt="" />' + '<br>' + ev.description;
-	      				  	    			var city = '<p>' + ev.city + '</p>';
-	      			 		     			var win = new google.maps.InfoWindow({
-	      				  	      				content: link + city
-	      				  	    			});
-        				    				win.open(map, marker);
-       	   							});
-       				 			});	
-      						}
+		//query meetup api
+		var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&order=ctime&desc=true&key=' + api_key + '&callback=?';
+		$.getJSON(ev_query, function(data) {
+
+			//handle error
+			if (data.status && data.status.match(/^200/) == null) {
+				alert(data.status + ": " + data.details);
+			} else {
+				$.each(data.results, function(i, ev) {
+
+					//create new point on map and extend bounds to include it
+					point = new google.maps.LatLng(ev.lat, ev.lon);
+					bounds.extend(point);
+					var marker = new google.maps.Marker({ 
+						position: new google.maps.LatLng(ev.lat, ev.lon), map: map, 
 					});
-       		 		
+				
+					//provide link for each point with event info
+			  		google.maps.event.addListener(marker, 'click', function() {
+			    			var link = '<h3><a href="http://www.meetup.com/' + ev.group_urlname + '">' + ev.name + '</a></h3><img src="' +  ev.photo_url +  '" alt="" />' + '<br>' + ev.description;
+		  	    			var city = '<p>' + ev.city + '</p>';
+	 		     			var win = new google.maps.InfoWindow({
+		  	      				content: link + city
+		  	    			});
+		    				win.open(map, marker);
+					});
+	 			});	
+			}
+		});      		 		
 		map.fitBounds(bounds);
 	};
 
@@ -57,6 +62,7 @@
 	Distance <input type="text" id="distance" />
 	<br>
 	<input type="button" value="Click me!" onclick="find_close_groups()" />
+	<br>
 	</form>
   <div id="map_canvas" style="width:75%; height:75%"></div>
 </body>
