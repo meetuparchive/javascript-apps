@@ -2,17 +2,20 @@
 <head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="saveApiKey.js"></script>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script>
   	function find_close_groups() {
 		
-		//enter your api key
-		var api_key = '';		
-		
+		var point;
+		var bounds = new google.maps.LatLngBounds();
+		var api_key = $('#api_key');		
 		var zip = $('#zipcode');
 		var dist = $('#distance');
-		var point
-		var bounds = new google.maps.LatLngBounds();
+
+		//check if a cookie is needed
+		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
+
 
 		//create map
 		var map = new google.maps.Map(document.getElementById("map_canvas"), {
@@ -22,7 +25,7 @@
     		});
 	
 		//query meetup api
-		var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&order=ctime&desc=true&key=' + api_key + '&callback=?';
+		var ev_query = 'http://api.meetup.com/groups.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&order=ctime&desc=true&key=' + api_key.val() + '&callback=?';
 		$.getJSON(ev_query, function(data) {
 
 			//handle error
@@ -56,12 +59,23 @@
 </script>
 </head>
 <body>
-	<form>
+	<form name="submitform">
 	Zip Code <input type="text" id="zipcode" />
 	<br>
 	Distance <input type="text" id="distance" />
 	<br>
-	<input type="button" value="Click me!" onclick="find_close_groups()" />
+
+	<script type="text/javascript">
+		var api = getAPIcookie();
+		document.write('API Key <input type="text" id="api_key" value="' + api +'" /><br>');
+	</script>
+	Save API Key?
+	<br>
+	Yes<input type="radio" name="save" id="save_api" value="yes" /> 
+	<br>
+	No<input type="radio" name="save" id="save_api" value="no" /> 
+	<br>
+	<input type="button" value="Show Map!" onclick="find_close_groups()" />
 	<br>
 	</form>
   <div id="map_canvas" style="width:75%; height:75%"></div>
