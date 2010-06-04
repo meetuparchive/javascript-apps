@@ -58,66 +58,14 @@ $.getJSON("http://api.meetup.com/ew/events?order=time&urlname="+ groupname +"&ke
 			if (i==0) {
 				//FORMAT TIME AND DATE
 				var myDate = new Date( ev.time);
-				var h = myDate.getHours();
-				var m = myDate.getMinutes();
-				var time_out = "";
-				var time = "AM";	
 
-				if (h >= 12) {time = "PM";}
-				if (h > 12) { h = h - 12;}
-				if (m > 9) { time_out = (h + ":" + m + " " + time);}
-				else {time_out = (h + ":0" + m + " " + time);}
-
-				var month_out = "";
-				switch (myDate.getMonth())
-				{
-				case 0:
-  					month_out = ("Jan");
-					break;
-				case 1:
-					month_out =  ("Feb");
-					break;
-				case 2:
-  					month_out =  ("Mar");
-					break;
-				case 3:
-					month_out =  ("Apr");
-					break;
-				case 4:
-					month_out =  ("May");
-					break;
-				case 5:
-					month_out =  ("Jun");
-					break;
-				case 6:
-					month_out =  ("Jul");
-					break;
-				case 7:
-					month_out =  ("Aug");
-					break;
-				case 8:
-					month_out =  ("Sep");
-					break;
-				case 9:
-					month_out =  ("Oct");
-					break;
-				case 10:
-					month_out =  ("Nov");
-					break;
-				case 11:
-					month_out =  ("Dec");
-					break;
-				default:
-					month_out =  ("Undef");
-				}
-				
 				if (ev.state) {
 					place = ev.state;
 				}
 				else {
 					place = ev.country;
 				}
-				time_date_area = time_date_area.concat("<a href=\"" + ev.meetup_url + "\"><span class=\"when birddogData\"><span class=\"date\">" + month_out + " " + (myDate.getDate()) + "</span><span class=\"time\">"+ time_out + "</span></span><span class=\"loc birddogData\"><span class=\"city linked\">" + ev.city+ ", " + place.toUpperCase() + "</span></span></a><a href=\""+ ev.meetup_url + "\"><span class=\"MEETUP_EVERYWHERE_WIDGET_all\">See all<span class=\"MEETUP_EVERYWHERE_WIDGET_go\">></span></span></a>");
+				time_date_area = time_date_area.concat("<a href=\"" + ev.meetup_url + "\"><span class=\"when birddogData\"><span class=\"date\">" + getMonth(myDate.getMonth()) + " " + (myDate.getDate()) + "</span><span class=\"time\">"+ getTime(myDate.getHours(),myDate.getMinutes()) + "</span></span><span class=\"loc birddogData\"><span class=\"city linked\">" + ev.city+ ", " + place.toUpperCase() + "</span></span></a><a href=\""+ ev.meetup_url + "\"><span class=\"MEETUP_EVERYWHERE_WIDGET_all\">See all<span class=\"MEETUP_EVERYWHERE_WIDGET_go\">></span></span></a>");
 			}
 			// MAP GENERATOR
 			if (i < 100) {
@@ -132,8 +80,46 @@ $.getJSON("http://api.meetup.com/ew/events?order=time&urlname="+ groupname +"&ke
 write();	
 });
 
-function parseCoord(loc) {
-	
+function getTime(h, m) {
+
+	var time = "AM";
+
+	if (h >= 12) {time = "PM";}
+	if (h > 12) { h = h - 12;}
+	if (m > 9) { return (h + ":" + m + " " + time);}
+	else {return (h + ":0" + m + " " + time);}
+}
+
+function getMonth(m) {
+	switch (m)
+	{
+	case 0:
+  		return ("Jan");
+	case 1:
+		return ("Feb");		
+	case 2:
+  		return ("Mar");
+	case 3:
+		return ("Apr");
+	case 4:
+		return ("May");
+	case 5:
+		return ("Jun");
+	case 6:
+		return ("Jul");
+	case 7:
+		return ("Aug");
+	case 8:
+		return ("Sep");
+	case 9:
+		return ("Oct");
+	case 10:
+		return ("Nov");
+	case 11:
+		return ("Dec");
+	default:
+		return ("Undef");
+	}
 }
 
 function write() {
