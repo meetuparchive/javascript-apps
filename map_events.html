@@ -1,7 +1,7 @@
 <html>
 <head>
 <style type="text/css">
-	.MEETUP_EVERYWHERE_WIDGET{
+	.MEETUP_WIDGET{
 		background: #1a1a1a;
 		-moz-border-radius: 4px;
 		-webkit-border-radius: 4px;
@@ -9,55 +9,55 @@
 		width: 800px;
 		font-family: verdana, sans-serif;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_body{
+	.MEETUP_WIDGET_body{
 		padding: 8px;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_total a{
+	.MEETUP_WIDGET_total a{
 		display: block;
 		color: #fff;
 		text-decoration: none;
 	}
-	.MEETUP_EVERYWHERE_WIDGET a img{
+	.MEETUP_WIDGET a img{
 		border: 0!important;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_total a img{
+	.MEETUP_WIDGET_total a img{
 		margin: 4px 0;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_title{
+	.MEETUP_WIDGET_title{
 		display: block;
 		font-family: arial, sans-serif;
 		font-weight: bold;
 		letter-spacing: -1px;
 		line-height: 1.2em;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_total .MEETUP_EVERYWHERE_WIDGET_title{
+	.MEETUP_WIDGET_total .MEETUP_WIDGET_title{
 		font-size: 22px;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_name{
+	.MEETUP_WIDGET_name{
 	}
-	.MEETUP_EVERYWHERE_WIDGET_logo{
+	.MEETUP_WIDGET_logo{
 		display: block;
 		text-align: left;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_people{
+	.MEETUP_WIDGET_people{
 		font-size: 12px;
 		display: block;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_suffix{
+	.MEETUP_WIDGET_suffix{
 		color: #aaa;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_title{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_title{
 		font-size: 14px;
 		color: #aaa;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list{
 		-moz-border-radius: 4px;
 		-webkit-border-radius: 4px;
 		border-radius: 4px;
 		display: block;
 		background: #333;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a{
 		zoom: 1;
 		border-top: 1px solid #1a1a1a!important;
 		padding: 8px 10px;
@@ -66,21 +66,21 @@
 		color: #fff;
 		text-decoration: none;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:after{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a:after{
 		content: ".";
 		display: block;
 		height: 0;
 		clear: both;
 		visibility: hidden;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:hover{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a:hover{
 		background: #a3e4ff;
 		color: #3c3633 !important;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a{
 		padding: 6px 10px;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a .MEETUP_EVERYWHERE_WIDGET_all{
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a .MEETUP_WIDGET_all{
 		display: block;
 		text-align: right;
 		display: block;
@@ -92,30 +92,30 @@
 		*/
 		font-size: 11.399999999999999px;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_bottom_logo{
+	.MEETUP_WIDGET_bottom_logo{
 		margin-top: 8px;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby a .when{
+	.MEETUP_WIDGET_nearby a .when{
 		display: block;
 		float: left;
 		width: 4em;
 		text-align: right;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc{
+	.MEETUP_WIDGET_nearby a .loc{
 		margin-left: 4.35em;
 		padding-left: .35em;
 		border-left: 1px dotted #555;
 		display: block;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .city{
+	.MEETUP_WIDGET_nearby a .loc .city{
 		font-weight: bold;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_nearby a .when .time,
-	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .address{
+	.MEETUP_WIDGET_nearby a .when .time,
+	.MEETUP_WIDGET_nearby a .loc .address{
 		font-size: 10.2px;
 		display: block;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_go{
+	.MEETUP_WIDGET_go{
 		background-color: #ca3e47;
 		background-image: -moz-linear-gradient(top, #ca3e47, #a8252e);
 		background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #a8252e),color-stop(1, #ca3e47));
@@ -139,8 +139,11 @@
 		cursor: pointer;
 		cursor: hand;
 	}
-	.MEETUP_EVERYWHERE_WIDGET_map{
-	
+	.MEETUP_WIDGET_map{
+		a:link {text-decoration: none}
+		a:visited {text-decoration: none}
+		a:active {text-decoration: none}
+		a:hover {text-decoration: underline; color: red;}
 	}
 </style>
 
@@ -204,7 +207,7 @@ function distance(lat1, lon1, lat2, lon2) {
 					adress = results[0].formatted_address;
 		  			
 					//query meetup api		
-					var ev_query = 'http://api.meetup.com/events.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
+					var ev_query = 'http://api.meetup.com/events.json/?lat=' + zip_lat + '&lon=' + zip_lon + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
 					$.getJSON(ev_query, function(data) {
 					
 						//handle error
@@ -221,16 +224,17 @@ function distance(lat1, lon1, lat2, lon2) {
 									if (dist2 < dist.val()){
 										
 										//create new point for each event and extend map bounds to include it
-										point = new google.maps.LatLng(ev.lat, ev.lon);
+										point = new google.maps.LatLng(ev.venue_lat, ev.venue_lon);
 										bounds.extend(point);
 										var marker = new google.maps.Marker({ 
-											position: new google.maps.LatLng(ev.venue_lat, ev.venue_lon), map: map, 
+											position: point, map: map, 
 										});
 	
 										//provide link for each point with event info
 						  				google.maps.event.addListener(marker, 'click', function() {
-						    					var link = '<h3><a href="' + ev.event_url + '">' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
-					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + '</p>';
+						    					var link = '<h3><a href="' + ev.event_url + '" style="color:Blue" >' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
+					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' ' +  '</p>';
+											
 				 		     					var win = new google.maps.InfoWindow({
 					  	      						content: link + loc
 					  	    					});
@@ -260,9 +264,9 @@ function distance(lat1, lon1, lat2, lon2) {
 </head>
 <body>
 <form name="submitform">
-	Zip Code <input type="text" id="zipcode" />
+	Location <input type="text" id="zipcode" />
 	<br>
-	Distance <input type="text" id="distance" />
+	Radius <input type="text" id="distance" />
 	<br>
 
 	<script type="text/javascript">
@@ -280,28 +284,28 @@ function distance(lat1, lon1, lat2, lon2) {
 </form>
 
 <br><br><br>
-<div id="MEETUP_EVERYWHERE_WIDGET_28" class="MEETUP_EVERYWHERE_WIDGET">
-	<div class="MEETUP_EVERYWHERE_WIDGET_body">
-		<div class="MEETUP_EVERYWHERE_WIDGET_total">
+<div id="MEETUP_WIDGET_28" class="MEETUP_WIDGET">
+	<div class="MEETUP_WIDGET_body">
+		<div class="MEETUP_WIDGET_total">
 
-				<span class="MEETUP_EVERYWHERE_WIDGET_title">
+				<span class="MEETUP_WIDGET_title">
 
-					<span class="MEETUP_EVERYWHERE_WIDGET_name"> </span>
-					<span class="MEETUP_EVERYWHERE_WIDGET_suffix"> Meetups near<br><div id="city"></div></span>
+					<span class="MEETUP_WIDGET_name"> </span>
+					<span class="MEETUP_WIDGET_suffix"> Meetups near<br><div id="city"></div></span>
 				</span>
 
 			
-				<div class="MEETUP_EVERYWHERE_WIDGET_map" id="map_canvas" style="width:100%; height:75%"></div>
+				<div class="MEETUP_WIDGET_map" id="map_canvas" style="width:100%; height:75%"></div>
 			<!/a>
 		</div>
-		<div class="MEETUP_EVERYWHERE_WIDGET_nearby">
-			<div class="MEETUP_EVERYWHERE_WIDGET_nearby_list">
+		<div class="MEETUP_WIDGET_nearby">
+			<div class="MEETUP_WIDGET_nearby_list">
 
 				
 			</div>
 		</div>
-		<a href="http://www.meetup.com/" class="MEETUP_EVERYWHERE_WIDGET_logo">
-			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_EVERYWHERE_WIDGET_bottom_logo"  />
+		<a href="http://www.meetup.com/" class="MEETUP_WIDGET_logo">
+			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_WIDGET_bottom_logo"  />
 		</a>
 	</div>
 </div>
