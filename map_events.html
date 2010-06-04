@@ -5,6 +5,20 @@
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script src="saveApiKey.js"></script>
 <script type="text/javascript">
+
+function distance(lat1, lon1, lat2, lon2) {
+	var R = 6371; // km
+	var dLat = (lat2-lat1)*(Math.PI / 180);
+	var dLon = (lon2-lon1)*(Math.PI / 180); 
+	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+	        Math.cos(lat1) * Math.cos(lat2) * 
+	        Math.sin(dLon/2) * Math.sin(dLon/2); 
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+	var d = R * c * 0.621371192;
+	return d
+}    
+
+
   	function find_close_groups() {
 		
 		var api_key = $('#api_key');
@@ -12,6 +26,11 @@
 		var dist = $('#distance');
 		var point
 		var bounds = new google.maps.LatLngBounds();
+		var geocoder = new google.maps.Geocoder();
+		var zip_lat;
+		var zip_lon;
+		var dist;
+		var count = 0;
 
 		//check if a cookie is needed
 		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
@@ -24,36 +43,57 @@
       			mapTypeId: google.maps.MapTypeId.ROADMAP
     		});
 	
-		//query meetup api		
-		var ev_query = 'http://api.meetup.com/events.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
-		$.getJSON(ev_query, function(data) {
-			
-			//handle error
-			if (data.status && data.status.match(/^200/) == null) {
-				alert(data.status + ": " + data.details);
-			} else {
-				$.each(data.results, function(i, ev) {
 
-					//create new point for each event and extend map bounds to include it
-					point = new google.maps.LatLng(ev.lat, ev.lon);
-					bounds.extend(point);
-					var marker = new google.maps.Marker({ 
-						position: new google.maps.LatLng(ev.venue_lat, ev.venue_lon), map: map, 
-					});
+			
+		if(geocoder){
+			geocoder.geocode( { 'address': zip.val()}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+		  			zip_lat = results[0].geometry.location.lat();
+					zip_lon = results[0].geometry.location.lng();
+		  			
+					//query meetup api		
+					var ev_query = 'http://api.meetup.com/events.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
+					$.getJSON(ev_query, function(data) {
+					
+						//handle error
+						if (data.status && data.status.match(/^200/) == null) {
+							alert(data.status + ": " + data.details);
+						} else {
+							$.each(data.results, function(i, ev) {
+								if (ev.venue_lon != ''){
+									dist2 = distance(ev.venue_lat, ev.venue_lon, zip_lat, zip_lon);
+									if (dist2 < dist.val()){
+										
+										//create new point for each event and extend map bounds to include it
+										point = new google.maps.LatLng(ev.lat, ev.lon);
+										bounds.extend(point);
+										var marker = new google.maps.Marker({ 
+											position: new google.maps.LatLng(ev.venue_lat, ev.venue_lon), map: map, 
+										});
 	
-					//provide link for each point with event info
-			  		google.maps.event.addListener(marker, 'click', function() {
-			    			var link = '<h3><a href="' + ev.event_url + '">' + ev.name + '</a></h3><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
-		  	    			var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' lat = ' + ev.venue_lat + ' lon = ' + ev.venue_lon + '</p>';
-	 		     			var win = new google.maps.InfoWindow({
-		  	      				content: link + loc
-		  	    			});
-		    				win.open(map, marker);
-					});
-	 			});	
-			}
-		});		
-		map.fitBounds(bounds);
+										//provide link for each point with event info
+						  				google.maps.event.addListener(marker, 'click', function() {
+						    					var link = '<h3><a href="' + ev.event_url + '">' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
+					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + '</p>';
+				 		     					var win = new google.maps.InfoWindow({
+					  	      						content: link + loc
+					  	    					});
+					    						win.open(map, marker);
+										});
+									}
+								}
+		 					});
+							map.fitBounds(bounds);	
+						}
+					});		
+
+
+		
+				} else {
+		  			alert("Geocode was not successful for the following reason: " + status);
+				}
+	      		});
+		}
 	};
 
 </script>
@@ -73,7 +113,7 @@
 	<br>
 	<input type="radio" name="save" id="save_api" value="yes" /> Yes
 	<br>
-	<input type="radio" name="save" id="save_api" value="no" checked /> No
+	<input type="radio" name="save" id="save_api" value="no" /> No
 	<br>
 	<input type="button" value="Show Map!" onclick="find_close_groups()" />
 	<br>
