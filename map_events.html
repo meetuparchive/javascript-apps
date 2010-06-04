@@ -227,7 +227,9 @@ function distance(lat1, lon1, lat2, lon2) {
 										point = new google.maps.LatLng(ev.venue_lat, ev.venue_lon);
 										bounds.extend(point);
 										var marker = new google.maps.Marker({ 
-											position: point, map: map, 
+											position: point,
+											map: map,
+											title: ev.name, 
 										});
 	
 										//provide link for each point with event info
