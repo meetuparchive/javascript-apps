@@ -1,0 +1,61 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="saveApiKey.js"></script>
+<script>
+
+
+$(function() {
+	
+	var groupname = $('#name');
+	var width = $('#size');
+	var key = $('#key');
+	var n = "";
+	var w = "";
+
+	document.getElementById('key').value = getAPIcookie();
+	
+	$('#gen').click(function() {
+
+		checkAddCookie(key.val(),document.f.yn[0].checked);
+
+		n = groupname.val();
+		w = width.val();
+		var code = "<script type=\"text/javascript\" src=\"widget/?size=" + w +"&name=" + n +"&key="+ key.val() +"\"><\/script>";
+		document.getElementById('output').value = code;
+		document.getElementById('preview').disabled = false;
+	});
+
+	$('#preview').click(function() {
+		window.open("woutput.html?size="+w+"&name="+n+"&key="+key.val(),'Preview',"width=500,height=500");
+	});
+
+});
+
+
+
+
+</script>
+</head>
+<body>
+<h1>WIDGET CREATOR</h1>
+
+<input type="text" id="name"></input> Group urlname <br>
+<input type="text" id="size"></input> Widget width in pixels <br>
+<input type="text" id="key"></input> API Key
+<form name="f">
+	Remember Me? &nbsp	
+	<input type="radio" name="yn" value="yes" checked> Yes
+	<input type="radio" name="yn" value="no" > No
+</form>
+ <br><br>
+
+<input type="submit" id="gen" value="Generate"></input>
+<br>
+<input type="text" size="80" id="output"></input>
+<input type="submit" id="preview" value="Preview" disabled=true></input>
+<br>
+<br>
+</body>
+
+</html>
