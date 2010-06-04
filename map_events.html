@@ -1,10 +1,156 @@
 <html>
 <head>
+<style type="text/css">
+	.MEETUP_EVERYWHERE_WIDGET{
+		background: #1a1a1a;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		width: 800px;
+		font-family: verdana, sans-serif;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_body{
+		padding: 8px;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_total a{
+		display: block;
+		color: #fff;
+		text-decoration: none;
+	}
+	.MEETUP_EVERYWHERE_WIDGET a img{
+		border: 0!important;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_total a img{
+		margin: 4px 0;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_title{
+		display: block;
+		font-family: arial, sans-serif;
+		font-weight: bold;
+		letter-spacing: -1px;
+		line-height: 1.2em;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_total .MEETUP_EVERYWHERE_WIDGET_title{
+		font-size: 22px;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_name{
+	}
+	.MEETUP_EVERYWHERE_WIDGET_logo{
+		display: block;
+		text-align: left;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_people{
+		font-size: 12px;
+		display: block;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_suffix{
+		color: #aaa;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_title{
+		font-size: 14px;
+		color: #aaa;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list{
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		display: block;
+		background: #333;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+		zoom: 1;
+		border-top: 1px solid #1a1a1a!important;
+		padding: 8px 10px;
+		display: block;
+		font-size: 12px;
+		color: #fff;
+		text-decoration: none;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:after{
+		content: ".";
+		display: block;
+		height: 0;
+		clear: both;
+		visibility: hidden;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:hover{
+		background: #a3e4ff;
+		color: #3c3633 !important;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+		padding: 6px 10px;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a .MEETUP_EVERYWHERE_WIDGET_all{
+		display: block;
+		text-align: right;
+		display: block;
+		font-family: arial, sans-serif;
+		font-weight: bold;
+		/*
+		text-transform: lowercase;
+		font-variant: small-caps;
+		*/
+		font-size: 11.399999999999999px;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_bottom_logo{
+		margin-top: 8px;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby a .when{
+		display: block;
+		float: left;
+		width: 4em;
+		text-align: right;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc{
+		margin-left: 4.35em;
+		padding-left: .35em;
+		border-left: 1px dotted #555;
+		display: block;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .city{
+		font-weight: bold;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_nearby a .when .time,
+	.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .address{
+		font-size: 10.2px;
+		display: block;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_go{
+		background-color: #ca3e47;
+		background-image: -moz-linear-gradient(top, #ca3e47, #a8252e);
+		background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #a8252e),color-stop(1, #ca3e47));
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ca3e47', endColorstr='#a8252e');
+		border: 2px solid #a8252e;
+		-moz-border-radius: 4px 4px 4px 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px 4px 4px 4px;
+		text-shadow: black 0px 0px 2px;
+		zoom: 1;
+		display: inline;
+		display: inline-block;
+		text-align: center;
+		font-weight: bold;
+		font-size: 15px;
+		margin-left: 2px;
+		line-height: .75em;
+		color: #fff!important;
+		font-family: arial;
+		padding: 0px 4px;
+		cursor: pointer;
+		cursor: hand;
+	}
+	.MEETUP_EVERYWHERE_WIDGET_map{
+	
+	}
+</style>
+
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script src="saveApiKey.js"></script>
 <script type="text/javascript">
+
+var adress;
 
 function distance(lat1, lon1, lat2, lon2) {
 	var R = 6371; // km
@@ -24,13 +170,17 @@ function distance(lat1, lon1, lat2, lon2) {
 		var api_key = $('#api_key');
 		var zip = $('#zipcode');
 		var dist = $('#distance');
+		var loc = $('#city');
 		var point
 		var bounds = new google.maps.LatLngBounds();
 		var geocoder = new google.maps.Geocoder();
 		var zip_lat;
 		var zip_lon;
 		var dist;
-		var count = 0;
+		var count = true;
+		
+		//clear location
+		loc.empty();
 
 		//check if a cookie is needed
 		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
@@ -48,8 +198,10 @@ function distance(lat1, lon1, lat2, lon2) {
 		if(geocoder){
 			geocoder.geocode( { 'address': zip.val()}, function(results, status) {
 				if (status == google.maps.GeocoderStatus.OK) {
+					//if geocoder status ok them save lat, lng, and adress
 		  			zip_lat = results[0].geometry.location.lat();
 					zip_lon = results[0].geometry.location.lng();
+					adress = results[0].formatted_address;
 		  			
 					//query meetup api		
 					var ev_query = 'http://api.meetup.com/events.json/?zip=' + zip.val() + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
@@ -61,7 +213,11 @@ function distance(lat1, lon1, lat2, lon2) {
 						} else {
 							$.each(data.results, function(i, ev) {
 								if (ev.venue_lon != ''){
+					
+									//figure out distance between zipcode and event location
 									dist2 = distance(ev.venue_lat, ev.venue_lon, zip_lat, zip_lon);
+
+									//add point only if distance is close enough
 									if (dist2 < dist.val()){
 										
 										//create new point for each event and extend map bounds to include it
@@ -83,7 +239,10 @@ function distance(lat1, lon1, lat2, lon2) {
 									}
 								}
 		 					});
-							map.fitBounds(bounds);	
+
+							//fit map and set loc to adress
+							map.fitBounds(bounds);
+							loc.append(adress);
 						}
 					});		
 
@@ -97,9 +256,10 @@ function distance(lat1, lon1, lat2, lon2) {
 	};
 
 </script>
+
 </head>
 <body>
-	<form name="submitform">
+<form name="submitform">
 	Zip Code <input type="text" id="zipcode" />
 	<br>
 	Distance <input type="text" id="distance" />
@@ -117,7 +277,33 @@ function distance(lat1, lon1, lat2, lon2) {
 	<br>
 	<input type="button" value="Show Map!" onclick="find_close_groups()" />
 	<br>
-	</form>
-  <div id="map_canvas" style="width:75%; height:75%"></div>
+</form>
+
+<br><br><br>
+<div id="MEETUP_EVERYWHERE_WIDGET_28" class="MEETUP_EVERYWHERE_WIDGET">
+	<div class="MEETUP_EVERYWHERE_WIDGET_body">
+		<div class="MEETUP_EVERYWHERE_WIDGET_total">
+
+				<span class="MEETUP_EVERYWHERE_WIDGET_title">
+
+					<span class="MEETUP_EVERYWHERE_WIDGET_name"> </span>
+					<span class="MEETUP_EVERYWHERE_WIDGET_suffix"> Meetups near<br><div id="city"></div></span>
+				</span>
+
+			
+				<div class="MEETUP_EVERYWHERE_WIDGET_map" id="map_canvas" style="width:100%; height:75%"></div>
+			<!/a>
+		</div>
+		<div class="MEETUP_EVERYWHERE_WIDGET_nearby">
+			<div class="MEETUP_EVERYWHERE_WIDGET_nearby_list">
+
+				
+			</div>
+		</div>
+		<a href="http://www.meetup.com/" class="MEETUP_EVERYWHERE_WIDGET_logo">
+			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_EVERYWHERE_WIDGET_bottom_logo"  />
+		</a>
+	</div>
+</div>
 </body>
 </html>
