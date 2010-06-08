@@ -279,8 +279,8 @@
 										}
 									});
 
-									random_offset = (2*Math.random() - 1)/50;
-									random_offset2 = (2*Math.random() - 1)/50;
+									random_offset = (2*Math.random() - 1)/100;
+									random_offset2 = (2*Math.random() - 1)/100;
 									//create new point for each event and extend map bounds to include it
 									point = new google.maps.LatLng(parseFloat(ev.lat) + random_offset, parseFloat(ev.lon) + random_offset2);
 									bounds.extend(point);
