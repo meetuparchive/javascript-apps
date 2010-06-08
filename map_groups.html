@@ -153,20 +153,58 @@
 <script src="saveApiKey.js"></script>
 <script type="text/javascript">
 
-var adress;
+	var adress;
+	var map;
+	var Groups = new Array();
 
-function distance(lat1, lon1, lat2, lon2) {
-	var R = 6371; // km
-	var dLat = (lat2-lat1)*(Math.PI / 180);
-	var dLon = (lon2-lon1)*(Math.PI / 180); 
-	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-	        Math.cos(lat1) * Math.cos(lat2) * 
-	        Math.sin(dLon/2) * Math.sin(dLon/2); 
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-	var d = R * c * 0.621371192;
-	return d
-}    
+	function Group_Object(){
+		this.ev = null;
+		this.marker = null;
+	}
+	
+	function Group_Object(ev, marker){
+		this.ev = ev;
+		this.marker = marker;
+	}
+	
+	function sortByCount(a, b){
+		return (a.count < b.count);
+	}
 
+	Array.prototype.indexOfTopic = function (top_id){
+		for (var i = 0; i < this.length; i++){
+			if (this[i].id == top_id){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	function topic_show(topic_id){
+		var bool = false;
+
+		for (var i = 0; i < Groups.length; i++){
+			if (topic_id != -1) {
+				$.each(Groups[i].ev.topics, function(j, top){
+					if (top.id == topic_id) {
+						bool = true;
+					}
+				});
+			}
+			else{
+				bool = true;
+			}
+			if (bool){
+				Groups[i].marker.setVisible(true);
+
+			}
+			else{
+				Groups[i].marker.setVisible(false);
+			}
+			bool = false;
+		}
+
+	}
 
   	function find_close_groups() {
 		
@@ -174,6 +212,7 @@ function distance(lat1, lon1, lat2, lon2) {
 		var zip = $('#zipcode');
 		var dist = $('#distance');
 		var loc = $('#city');
+		var topic = $('#topics');
 		var point
 		var bounds = new google.maps.LatLngBounds();
 		var geocoder = new google.maps.Geocoder();
@@ -181,23 +220,29 @@ function distance(lat1, lon1, lat2, lon2) {
 		var zip_lon;
 		var dist;
 		var count = true;
+		var topic_count = new Array();
+		var topic_index;
+		var topic_object;
+		var marker;
+		var group;
 		
+		Groups = new Array();
 		//clear location
 		loc.empty();
-
+		
 		//check if a cookie is needed
 		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
 
 	
 		//create map
-		var map = new google.maps.Map(document.getElementById("map_canvas"), {
+		map = new google.maps.Map(document.getElementById("map_canvas"), {
       			zoom: 15,
       			center: new google.maps.LatLng(0,0),
       			mapTypeId: google.maps.MapTypeId.ROADMAP
     		});
-	
-
-			
+		
+		
+		
 		if(geocoder){
 			geocoder.geocode( { 'address': zip.val()}, function(results, status) {
 				if (status == google.maps.GeocoderStatus.OK) {
@@ -216,16 +261,38 @@ function distance(lat1, lon1, lat2, lon2) {
 						} else {
 							$.each(data.results, function(i, ev) {
 								if (ev.lon != ''){
-								
+
+									//loop through topics								
+									$.each(ev.topics, function (j, top) {
+										topic_index = topic_count.indexOfTopic(top.id);
+										if (topic_index == -1){
+											topic_object = new Object;
+											topic_object.id = top.id;
+											topic_object.name = top.name;
+											topic_object.count = 1;
+											topic_count.push(topic_object);
+										}
+										else {
+											topic_count[topic_index].count++;
+											
+										}
+									});
+
+									
+
 									//create new point for each event and extend map bounds to include it
 									point = new google.maps.LatLng(ev.lat, ev.lon);
 									bounds.extend(point);
-									var marker = new google.maps.Marker({ 
+									marker = new google.maps.Marker({ 
 										position: point,
 										map: map,
 										title: ev.name 
 									});
 	
+									group = new Group_Object(ev, marker);
+									Groups.push(group);
+
+
 									//provide link for each point with event info
 					  				google.maps.event.addListener(marker, 'click', function() {
 					    					var link = '<h3><a href="' + ev.link + '" style="color:Blue" >' + ev.name + '</a></h3> ' + '<center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description
@@ -240,6 +307,16 @@ function distance(lat1, lon1, lat2, lon2) {
 								}
 		 					});
 
+							topic_count.sort(sortByCount);
+							topic.empty();
+							for (var i = 0; i < 10; i++){
+								if (i < topic_count.length) {
+									topic.append('<a href="javascript:topic_show(' + topic_count[i].id + ')">' + topic_count[i].count + " " + topic_count[i].name + "</a>");
+								}
+							}
+							topic.append('<a href="javascript:topic_show(-1)">Show All</a>');
+				
+				
 							//fit map and set loc to adress
 							map.fitBounds(bounds);
 							loc.append(adress);
@@ -292,11 +369,14 @@ function distance(lat1, lon1, lat2, lon2) {
 
 			
 				<div class="MEETUP_WIDGET_map" id="map_canvas" style="width:100%; height:75%"></div>
-			<!/a>
+			
 		</div>
 		<div class="MEETUP_WIDGET_nearby">
-			<div class="MEETUP_WIDGET_nearby_list">
-
+			<div class="MEETUP_WIDGET_title">
+			Top Topics in Your Area
+			</div>
+			<div class="MEETUP_WIDGET_nearby_list" id="topics">
+				
 				
 			</div>
 		</div>
