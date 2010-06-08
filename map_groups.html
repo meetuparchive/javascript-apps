@@ -223,9 +223,10 @@
 		var topic_count = new Array();
 		var topic_index;
 		var topic_object;
-		var marker;
+		//var marker;
 		var group;
-		
+		var random_offset;
+		var random_offset2;
 		Groups = new Array();
 		//clear location
 		loc.empty();
@@ -278,12 +279,12 @@
 										}
 									});
 
-									
-
+									random_offset = (2*Math.random() - 1)/50;
+									random_offset2 = (2*Math.random() - 1)/50;
 									//create new point for each event and extend map bounds to include it
-									point = new google.maps.LatLng(ev.lat, ev.lon);
+									point = new google.maps.LatLng(parseFloat(ev.lat) + random_offset, parseFloat(ev.lon) + random_offset2);
 									bounds.extend(point);
-									marker = new google.maps.Marker({ 
+									var marker = new google.maps.Marker({ 
 										position: point,
 										map: map,
 										title: ev.name 
@@ -311,7 +312,7 @@
 							topic.empty();
 							for (var i = 0; i < 10; i++){
 								if (i < topic_count.length) {
-									topic.append('<a href="javascript:topic_show(' + topic_count[i].id + ')">' + topic_count[i].count + " " + topic_count[i].name + "</a>");
+									topic.append('<a href="javascript:topic_show(' + topic_count[i].id + ')">' + topic_count[i].name + "</a>");
 								}
 							}
 							topic.append('<a href="javascript:topic_show(-1)">Show All</a>');

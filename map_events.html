@@ -236,9 +236,9 @@ function distance(lat1, lon1, lat2, lon2) {
 						  				google.maps.event.addListener(marker, 'click', function() {
 						    					var link = '<h3><a href="' + ev.event_url + '" style="color:Blue" >' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
 					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' ' +  '</p>';
-											
+												
 				 		     					var win = new google.maps.InfoWindow({
-					  	      						content: link + loc
+					  	      						content: link + loc,
 					  	    					});
 					    						win.open(map, marker);
 										});
