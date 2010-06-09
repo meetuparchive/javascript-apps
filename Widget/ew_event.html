@@ -1,0 +1,291 @@
+<html>
+<head>
+<style type="text/css">
+.MEETUP_EVERYWHERE_WIDGET{
+background: #1a1a1a;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+width: 250px;
+font-family: verdana, sans-serif;
+}
+.MEETUP_EVERYWHERE_WIDGET_body{
+padding: 8px;
+}
+.MEETUP_EVERYWHERE_WIDGET_total a{
+display: block;
+color: #fff;
+text-decoration: none;
+}
+.MEETUP_EVERYWHERE_WIDGET img{
+padding:0!important;
+margin:0!important;
+background-color:transparent!important;
+}
+.MEETUP_EVERYWHERE_WIDGET a img{
+border: 0!important;
+}
+.MEETUP_EVERYWHERE_WIDGET_total a img{
+margin: 4px 0!important;
+}
+.MEETUP_EVERYWHERE_WIDGET_title{
+display: block;
+font-family: arial, sans-serif;
+font-weight: bold;
+letter-spacing: -1px;
+line-height: 1.2em;
+}
+.MEETUP_EVERYWHERE_WIDGET_total .MEETUP_EVERYWHERE_WIDGET_title{
+font-size: 22px;
+}
+.MEETUP_EVERYWHERE_WIDGET_name{
+}
+.MEETUP_EVERYWHERE_WIDGET_logo{
+display: block;
+text-align: left;
+}
+.MEETUP_EVERYWHERE_WIDGET_people{
+font-size: 16px;
+font-weight: bold;
+letter-spacing: 0px;
+font-family: arial, sans-serif;
+display: block;
+}
+.MEETUP_EVERYWHERE_WIDGET_saying{
+font-size: 10px;
+color: #aaa;
+
+}
+.MEETUP_EVERYWHERE_WIDGET_suffix{
+color: #aaa;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_title{
+font-size: 14px;
+color: #aaa;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list{
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+display: block;
+background: #333;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+zoom: 1;
+border-top: 1px solid #1a1a1a!important;
+padding: 8px 10px;
+display: block;
+font-size: 10px;
+color: #fff;
+text-decoration: none;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:after{
+content: ".";
+display: block;
+height: 0;
+clear: both;
+visibility: hidden; }
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a:hover{
+background: #a3e4ff;
+color: #3c3633 !important;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a{
+padding: 6px 10px;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby .MEETUP_EVERYWHERE_WIDGET_nearby_list a .MEETUP_EVERYWHERE_WIDGET_all{
+display: block;
+text-align: center;
+display: block;
+font-family: arial, sans-serif;
+font-weight: bold;
+/*
+text-transform: lowercase;
+font-variant: small-caps;
+*/
+font-size: 11.399999999999999px;
+}
+.MEETUP_EVERYWHERE_WIDGET_bottom_logo{
+margin-top: 8px;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby a .when{
+display: block;
+float: left;
+width: 4em;
+text-align: right;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby a .loc{
+margin-left: 4.35em;
+padding-left: .35em;
+border-left: 1px dotted #555;
+display: block;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .city{
+font-weight: bold;
+}
+.MEETUP_EVERYWHERE_WIDGET_nearby a .whehtml small textn .time,
+.MEETUP_EVERYWHERE_WIDGET_nearby a .loc .address{
+font-size: 10.2px;
+display: block;
+}
+.MEETUP_EVERYWHERE_WIDGET_go{
+background-color: #ca3e47;
+background-image: -moz-linear-gradient(top, #ca3e47, #a8252e);
+background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #a8252e),color-stop(1, #ca3e47));
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ca3e47', endColorstr='#a8252e');
+border: 2px solid #a8252e;
+-moz-border-radius: 4px 4px 4px 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px 4px 4px 4px;
+text-shadow: black 0px 0px 2px;
+zoom: 1;
+display: inline;
+display: inline-block;
+text-align: center;
+font-weight: bold;
+font-size: 15px;
+margin-left: 2px;
+line-height: .75em;
+color: #fff!important;
+font-family: arial;
+padding: 0px 4px;
+cursor: pointer;
+cursor: hand;
+}
+.MEETUP_WIDGET_map{
+
+}
+.MEETUP_WIDGET_map{
+a:link {text-decoration: none}
+a:visited {text-decoration: none}html small text
+a:active {text-decoration: none}
+a:hover {text-decoration: underline; color: red;}
+}
+.MEETUP_WIDGET_comment{
+text-size: 5px;
+}
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	var ev_name = $('#eventName');	
+	var ev_loc = $('#eventLoc');
+	var ev_date = $('#eventDate');
+	var ev_comm = $('#comments');
+	var saying = $('#saying');
+	var rsvp = $('#rsvp');
+
+	//VARIABLES
+	var q_id = gup("id");
+	var maxComments = gup("max");
+	var key = gup("key");
+	var query1 = "http://api.meetup.com/ew/events?fields=rsvp_count&event_id="+q_id+"&key="+key+"&callback=?";
+	var query2 = "http://api.meetup.com/ew/comments?event_id="+q_id+"&key="+key+"&callback=?";
+	$.getJSON(query1, function(data) {
+		//handle error
+		if (data.status && data.status.match(/^200/) == null) {
+			alert(data.status + ": " + data.details);
+		} else {
+			$.each(data.results, function(i, ev) {
+				ev_name.append(ev.container.name+" Meetup in");
+				
+				if (ev.state) {
+					ev_loc.append(ev.city+", "+ev.state+" "+ev.country.toUpperCase());
+				}
+				else {
+					ev_loc.append(ev.city+", "+ev.country.toUpperCase());
+				}
+				ev_loc.append(" - "+ev.rsvp_count+" RSVPs");
+				var myDate = new Date(ev.time);
+				ev_date.append((myDate.getMonth()+1)+"/"+myDate.getDate()+"   "+getTime(myDate.getHours(),myDate.getMinutes()));
+				//ev_date.append(ev.venue_name);
+
+				rsvp.append("<a href=\""+ev.meetup_url+"\"><span class=\"MEETUP_EVERYWHERE_WIDGET_all\"><span class=\"MEETUP_EVERYWHERE_WIDGET_go\">RSVP</span></span></a>");
+				
+			});
+		}
+	});
+	$.getJSON(query2, function(data) {
+		if (data.status && data.status.match(/^200/) == null) {
+			alert(data.status + ": " + data.details);
+		} else {
+			if(data.meta.total_count > 0) {
+				saying.append("<span class=\"MEETUP_EVERYWHERE_WIDGET_saying\">What People Are Saying:</span>");
+				$.each(data.results, function(i, ev) {
+					if(i < maxComments) {
+						var myDate = new Date(ev.time);
+						addCommentDiv(ev_comm,ev.member.name,ev.comment,getTime(myDate.getHours(),myDate.getMinutes()),(myDate.getMonth()+1)+"/"+myDate.getDate());
+					}
+				});
+			}
+		}
+	});
+
+	function addCommentDiv(div, name, comment, time, date) {
+		div.append("<a><span class=\"city linked\">"+name+" said: "+comment+" <br>@ "+time+" on "+date+"</span></a>");
+	}
+
+});
+
+function getTime(h, m) {
+
+	var time = "AM";
+
+	if (h >= 12) {time = "PM";}
+	if (h > 12) { h = h - 12;}
+	if (m > 9) { return (h + ":" + m + " " + time);}
+	else {return (h + ":0" + m + " " + time);}
+}
+
+function gup( name )
+{
+  var scripts = document.getElementsByTagName('script');
+  var index = scripts.length - 1;
+  var myScript = scripts[index];
+  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  var regexS = "[\\?&]"+name+"=([^&#]*)";
+  var regex = new RegExp( regexS );
+  var results = regex.exec( window.location.href);
+  if( results == null )
+    return "";
+  else
+    return results[1];
+}
+
+
+</script>
+</head>
+<body>
+
+<div id="MEETUP_EVERYWHERE_WIDGET_28" class="MEETUP_EVERYWHERE_WIDGET">
+	<div class="MEETUP_EVERYWHERE_WIDGET_body">
+		<div class="MEETUP_EVERYWHERE_WIDGET_total">
+			<a href="http://www.meetup.com/">
+				<span class="MEETUP_EVERYWHERE_WIDGET_title">
+					<span class="MEETUP_EVERYWHERE_WIDGET_name"><div id="eventName"></div></span>
+					<span class="MEETUP_EVERYWHERE_WIDGET_suffix"><div id="eventLoc"></div></span>
+					<span class="MEETUP_EVERYWHERE_WIDGET_people"><div id="eventDate"></div></span>
+				</span>
+				<div id="saying"></div>
+			</a>
+			
+		</div>
+		
+		<div class="MEETUP_EVERYWHERE_WIDGET_nearby">
+			<div class="MEETUP_EVERYWHERE_WIDGET_nearby_list">
+
+				<div id="comments"></div>
+				<div id="rsvp"></div>
+
+			</div>
+		</div>
+		<br>
+		<a href="http://www.meetup.com/" class="MEETUP_EVERYWHERE_WIDGET_logo">
+			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_EVERYWHERE_WIDGET_bottom_logo">
+		</a>
+	</div>
+</div><!-- end Meetup Everywhere widget -->
+
+
+</body>
+
+</html>

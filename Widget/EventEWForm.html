@@ -1,0 +1,40 @@
+<html>
+<head>
+<script src="saveApiKey.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script>
+$(function() {
+
+	var key = $('#key');
+	document.getElementById('key').value = getAPIcookie();
+
+	$('#sub').click(function() {
+		checkAddCookie(key.val(),document.f.yn[0].checked);
+	});
+
+
+});
+</script>
+</head>
+
+
+<body>
+<h1>Meetup Everywhere Event Widget</h1> 
+<form name="f" action="ew_event.html" method="get" target="_blank">
+<p>
+<input type="text" size="5" name="id"></input> Enter An Event ID# <br>
+<input type="text" size="3" name="max"></input> Maximum Comments to Display <br>
+<input type="text" size ="35" id="key" name="key"></input> Enter Your Meetup Developer API Key <br>
+Remember Me? &nbsp	
+<input type="radio" name="yn" value="yes" checked> Yes
+<input type="radio" name="yn" value="no" > No
+<br><input type="submit" id="sub" value="Create"></input>
+</p>
+
+
+
+</form>
+
+
+</body>
+</html>
