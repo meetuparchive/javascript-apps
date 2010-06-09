@@ -1,0 +1,615 @@
+<html>
+<head>
+<style type="text/css">
+	.MEETUP_WIDGET{
+		background: #1a1a1a;
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		width: 800px;
+		font-family: verdana, sans-serif;
+	}
+	.MEETUP_WIDGET_body{
+		padding: 8px;
+	}
+	.MEETUP_WIDGET_total a{
+		display: block;
+		color: #fff;
+		text-decoration: none;
+	}
+	.MEETUP_WIDGET a img{
+		border: 0!important;
+	}
+	.MEETUP_WIDGET_total a img{
+		margin: 4px 0;
+	}
+	.MEETUP_WIDGET_title{
+		display: block;
+		font-family: arial, sans-serif;
+		font-weight: bold;
+		letter-spacing: -1px;
+		line-height: 1.2em;
+	}
+	.MEETUP_WIDGET_total .MEETUP_WIDGET_title{
+		font-size: 22px;
+	}
+	.MEETUP_WIDGET_name{
+	}
+	.MEETUP_WIDGET_logo{
+		display: block;
+		text-align: left;
+	}
+	.MEETUP_WIDGET_people{
+		font-size: 12px;
+		display: block;
+	}
+	.MEETUP_WIDGET_suffix{
+		color: #aaa;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_title{
+		font-size: 14px;
+		color: #aaa;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list{
+		-moz-border-radius: 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px;
+		display: block;
+		background: #333;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a{
+		zoom: 1;
+		border-top: 1px solid #1a1a1a!important;
+		padding: 8px 10px;
+		display: block;
+		font-size: 12px;
+		color: #fff;
+		text-decoration: none;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a:after{
+		content: ".";
+		display: block;
+		height: 0;
+		clear: both;
+		visibility: hidden;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a:hover{
+		background: #a3e4ff;
+		color: #3c3633 !important;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a{
+		padding: 6px 10px;
+	}
+	.MEETUP_WIDGET_nearby .MEETUP_WIDGET_nearby_list a .MEETUP_WIDGET_all{
+		display: block;
+		text-align: right;
+		display: block;
+		font-family: arial, sans-serif;
+		font-weight: bold;
+		/*
+		text-transform: lowercase;
+		font-variant: small-caps;
+		*/
+		font-size: 11.399999999999999px;
+	}
+	.MEETUP_WIDGET_bottom_logo{
+		margin-top: 8px;
+	}
+	.MEETUP_WIDGET_nearby a .when{
+		display: block;
+		float: left;
+		width: 4em;
+		text-align: right;
+	}
+	.MEETUP_WIDGET_nearby a .loc{
+		margin-left: 4.35em;
+		padding-left: .35em;
+		border-left: 1px dotted #555;
+		display: block;
+	}
+	.MEETUP_WIDGET_nearby a .loc .city{
+		font-weight: bold;
+	}
+	.MEETUP_WIDGET_nearby a .when .time,
+	.MEETUP_WIDGET_nearby a .loc .address{
+		font-size: 10.2px;
+		display: block;
+	}
+	.MEETUP_WIDGET_go{
+		background-color: #ca3e47;
+		background-image: -moz-linear-gradient(top, #ca3e47, #a8252e);
+		background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #a8252e),color-stop(1, #ca3e47));
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ca3e47', endColorstr='#a8252e');
+		border: 2px solid #a8252e;
+		-moz-border-radius: 4px 4px 4px 4px;
+		-webkit-border-radius: 4px;
+		border-radius: 4px 4px 4px 4px;
+		text-shadow: black 0px 0px 2px;
+		zoom: 1;
+		display: inline;
+		display: inline-block;
+		text-align: center;
+		font-weight: bold;
+		font-size: 15px;
+		margin-left: 2px;
+		line-height: .75em;
+		color: #fff!important;
+		font-family: arial;
+		padding: 0px 4px;
+		cursor: pointer;
+		cursor: hand;
+	}
+	.MEETUP_WIDGET_map{
+		a:link {text-decoration: none}
+		a:visited {text-decoration: none}
+		a:active {text-decoration: none}
+		a:hover {text-decoration: underline; color: red;}
+	}
+</style>
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="saveApiKey.js"></script>
+<script type="text/javascript">
+
+	var adress;
+	var map;
+	var Groups = new Array();
+
+	function Group_Object(){
+		this.ev = null;
+		this.marker = null;
+	}
+	
+	function Group_Object(ev, marker){
+		this.ev = ev;
+		this.marker = marker;
+	}
+	
+	function sortByCount(a, b){
+		return (a.count < b.count);
+	}
+
+	Array.prototype.indexOfTopic = function (top_id){
+		for (var i = 0; i < this.length; i++){
+			if (this[i].id == top_id){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	function topic_show(topic_id){
+		var bool = false;
+
+		for (var i = 0; i < Groups.length; i++){
+			if (topic_id != -1) {
+				$.each(Groups[i].ev.topics, function(j, top){
+					if (top.id == topic_id) {
+						bool = true;
+					}
+				});
+			}
+			else{
+				bool = true;
+			}
+			if (bool){
+				Groups[i].marker.setVisible(true);
+
+			}
+			else{
+				Groups[i].marker.setVisible(false);
+			}
+			bool = false;
+		}
+
+	}
+
+	function create_map(){
+		map = new google.maps.Map(document.getElementById("map_canvas"), {
+      		zoom: 15,
+      		center: new google.maps.LatLng(0,0),
+      		mapTypeId: google.maps.MapTypeId.ROADMAP
+    	});
+	}
+
+	function distance(lat1, lon1, lat2, lon2) {
+		var R = 6371; // km
+		var dLat = (lat2-lat1)*(Math.PI / 180);
+		var dLon = (lon2-lon1)*(Math.PI / 180); 
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		        Math.cos(lat1) * Math.cos(lat2) * 
+		        Math.sin(dLon/2) * Math.sin(dLon/2); 
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		var d = R * c * 0.621371192;
+		return d
+	}    
+
+	function use_everywhere(){
+			var api_key = $('#api_key');
+
+			var bounds = new google.maps.LatLngBounds();
+			var geocoder = new google.maps.Geocoder();
+	
+			var zip = $('#zipcode');
+			var dist = $('#distance');
+			var loc = $('#city');
+			var topic = $('#topics');
+			topic.empty();
+			var topic_title = $('#topics_title');
+			topic_title.empty();
+			
+			//clear location
+			loc.empty();
+			
+			//check if a cookie is needed
+			checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
+		
+			//create map
+			create_map();
+		
+			if (geocoder) {
+				geocoder.geocode({
+					'address': zip.val()
+				}, function(results, status){					
+					if (status == google.maps.GeocoderStatus.OK) {
+						
+						//if geocoder status ok them save lat, lng, and adress
+						zip_lat = results[0].geometry.location.lat();
+						zip_lon = results[0].geometry.location.lng();
+						adress = results[0].formatted_address;
+						
+						//query meetup api		
+						var ev_query = 'http://api.meetup.com/ew/events.json/?lat=' + zip_lat + '&lon=' + zip_lon + '&radius=' + dist.val() + '&key=' + api_key.val() + '&callback=?';
+						$.getJSON(ev_query, function(data){
+							
+							//handle error
+							if (data.status && data.status.match(/^200/) == null) {
+								alert(data.status + ": " + data.details);
+							} else {
+								
+								$.each(data.results, function(i, ev) {
+									if ((ev.lon != '') && (ev.venue_name != undefined)){
+				
+											random_offset = (2*Math.random() - 1)/500;
+											random_offset2 = (2*Math.random() - 1)/500;
+											//create new point for each event and extend map bounds to include it
+											point = new google.maps.LatLng(parseFloat(ev.lat) + random_offset, parseFloat(ev.lon) + random_offset2);
+											bounds.extend(point);
+											var marker = new google.maps.Marker({ 
+												position: point,
+												map: map,
+												title: ev.name, 
+											});
+		
+											//provide link for each point with event info
+							  				google.maps.event.addListener(marker, 'click', function() {
+												var date = new Date(ev.time);
+												var date_string = date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear() + " " + date.getHours() + ":";
+												if (date.getMinutes() < 10) {
+													date_string = date_string + "0" + date.getMinutes();
+												}
+												else{
+													date_string = date_string + date.getMinutes();
+												}
+												var link = '<b><a href="' + ev.meetup_url + '" style="color:Blue">' + ev.container.name + '</a></b><br>WHERE: ' + ev.venue_name + '<br>WHEN: ' + date_string + '<br>';
+												
+												var comment_query = 'http://api.meetup.com/ew/comment.json/?event_id=' + ev.id + '&key=' + api_key.val() + '&callback=?';
+												/*$.getJSON(comment_query, function(dat){
+													$.each(dat.results, function(j, ev2) {
+															link = link + com.member.name + ": " + com.comment;
+													});
+												});*/
+					 		     				var win = new google.maps.InfoWindow({
+						  	      					content: link,
+						  	    				});
+						    					win.open(map, marker);
+											});
+										
+									}
+			 					});
+	
+								//fit map and set loc to adress
+								map.fitBounds(bounds);
+								loc.append(adress);
+							}
+						});
+					}
+				});
+			}
+		}
+
+  	function use_events() {
+		
+		var api_key = $('#api_key');
+		var zip = $('#zipcode');
+		var dist = $('#distance');
+		var loc = $('#city');
+		var topic = $('#topics');
+		topic.empty();
+		var topic_title = $('#topics_title');
+		topic_title.empty();
+		var point
+		var bounds = new google.maps.LatLngBounds();
+		var geocoder = new google.maps.Geocoder();
+		var zip_lat;
+		var zip_lon;
+		var dist;
+		var count = true;
+		
+		//clear location
+		loc.empty();
+
+		//check if a cookie is needed
+		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
+
+	
+		//create map
+		create_map();
+			
+		if(geocoder){
+			geocoder.geocode( { 'address': zip.val()}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					//if geocoder status ok them save lat, lng, and adress
+		  			zip_lat = results[0].geometry.location.lat();
+					zip_lon = results[0].geometry.location.lng();
+					adress = results[0].formatted_address;
+		  			
+					//query meetup api		
+					var ev_query = 'http://api.meetup.com/events.json/?lat=' + zip_lat + '&lon=' + zip_lon + '&radius=' + dist.val()  + '&key=' + api_key.val() + '&callback=?';
+					$.getJSON(ev_query, function(data) {
+					
+						//handle error
+						if (data.status && data.status.match(/^200/) == null) {
+							alert(data.status + ": " + data.details);
+						} else {
+							$.each(data.results, function(i, ev) {
+								if (ev.venue_lon != ''){
+					
+									//figure out distance between zipcode and event location
+									dist2 = distance(ev.venue_lat, ev.venue_lon, zip_lat, zip_lon);
+
+									//add point only if distance is close enough
+									if (dist2 < dist.val()){
+										
+										//create new point for each event and extend map bounds to include it
+										point = new google.maps.LatLng(ev.venue_lat, ev.venue_lon);
+										bounds.extend(point);
+										var marker = new google.maps.Marker({ 
+											position: point,
+											map: map,
+											title: ev.name, 
+										});
+	
+										//provide link for each point with event info
+						  				google.maps.event.addListener(marker, 'click', function() {
+						    					var link = '<h3><a href="' + ev.event_url + '" style="color:Blue" >' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
+					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' ' +  '</p>' + ev.group_name + '<br>';
+												
+				 		     					var win = new google.maps.InfoWindow({
+					  	      						content: link + loc,
+					  	    					});
+					    						win.open(map, marker);
+										});
+									}
+								}
+		 					});
+
+							//fit map and set loc to adress
+							map.fitBounds(bounds);
+							loc.append(adress);
+						}
+					});		
+
+
+		
+				} else {
+		  			alert("Geocode was not successful for the following reason: " + status);
+				}
+	      		});
+		}
+	};
+
+  	function use_groups() {
+		
+		var api_key = $('#api_key');
+		var zip = $('#zipcode');
+		var dist = $('#distance');
+		var loc = $('#city');
+		var topic = $('#topics');
+		var topic_title = $('#topics_title');
+		topic_title.empty();
+		topic_title.append("Top Topics in Your Area");
+		var point
+		var bounds = new google.maps.LatLngBounds();
+		var geocoder = new google.maps.Geocoder();
+		var zip_lat;
+		var zip_lon;
+		var dist;
+		var count = true;
+		var topic_count = new Array();
+		var topic_index;
+		var topic_object;
+		//var marker;
+		var group;
+		var random_offset;
+		var random_offset2;
+		Groups = new Array();
+		
+		//clear location
+		loc.empty();
+		
+		//check if a cookie is needed
+		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
+
+		//create map
+		create_map();			
+		
+		if(geocoder){
+			geocoder.geocode( { 'address': zip.val()}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					//if geocoder status ok them save lat, lng, and adress
+		  			zip_lat = results[0].geometry.location.lat();
+					zip_lon = results[0].geometry.location.lng();
+					adress = results[0].formatted_address;
+		  			
+					//query meetup api		
+					var ev_query = 'http://api.meetup.com/groups.json/?lat=' + zip_lat + '&lon=' + zip_lon + '&radius=' + dist.val()  + '&order=ctime&desc=true&key=' + api_key.val() + '&callback=?';
+					$.getJSON(ev_query, function(data) {
+					
+						//handle error
+						if (data.status && data.status.match(/^200/) == null) {
+							alert(data.status + ": " + data.details);
+						} else {
+							$.each(data.results, function(i, ev) {
+								if (ev.lon != ''){
+
+									//loop through topics								
+									$.each(ev.topics, function (j, top) {
+										topic_index = topic_count.indexOfTopic(top.id);
+										if (topic_index == -1){
+											topic_object = new Object;
+											topic_object.id = top.id;
+											topic_object.name = top.name;
+											topic_object.count = 1;
+											topic_count.push(topic_object);
+										}
+										else {
+											topic_count[topic_index].count++;
+											
+										}
+									});
+
+									random_offset = (2*Math.random() - 1)/500;
+									random_offset2 = (2*Math.random() - 1)/500;
+									//create new point for each event and extend map bounds to include it
+									point = new google.maps.LatLng(parseFloat(ev.lat) + random_offset, parseFloat(ev.lon) + random_offset2);
+									bounds.extend(point);
+									var marker = new google.maps.Marker({ 
+										position: point,
+										map: map,
+										title: ev.name 
+									});
+	
+									group = new Group_Object(ev, marker);
+									Groups.push(group);
+
+
+									//provide link for each point with event info
+					  				google.maps.event.addListener(marker, 'click', function() {
+					    					var link = '<h3><a href="' + ev.link + '" style="color:Blue" >' + ev.name + '</a></h3> ' + '<center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description
+					  	    				var loc = '<p>' + ev.city + ', ' + ev.state + ' ' + ev.country + '</p>';
+										
+				 		     				var win = new google.maps.InfoWindow({
+					  	      					content: link + loc
+					  	    				});
+					    					win.open(map, marker);
+									});
+									
+								}
+		 					});
+
+							topic_count.sort(sortByCount);
+							topic.empty();
+							for (var i = 0; i < 10; i++){
+								if (i < topic_count.length) {
+									topic.append('<a href="javascript:topic_show(' + topic_count[i].id + ')">' + topic_count[i].name + "</a>");
+								}
+							}
+							topic.append('<a href="javascript:topic_show(-1)">Show All</a>');
+				
+				
+							//fit map and set loc to adress
+							map.fitBounds(bounds);
+							loc.append(adress);
+						}
+					});		
+
+
+		
+				} else {
+		  			alert("Geocode was not successful for the following reason: " + status);
+				}
+	      		});
+		}
+	};
+
+  	function find_close_groups(){
+		var title = $('#title');
+		title.empty();
+		if (document.submitform.type[0].checked){
+			title.append("Groups Near");
+			use_groups();
+		}
+		if(document.submitform.type[1].checked){
+			title.append("Events Near");
+			use_events();
+		}
+		if(document.submitform.type[2].checked){
+			title.append("Everywhere Events Near");
+			use_everywhere();
+		}
+	}
+</script>
+
+</head>
+<body>
+<form name="submitform">
+	Location <input type="text" id="zipcode" />
+	<br>
+	Radius <input type="text" id="distance" />
+	<br><br>
+	Groups <input type="radio" name="type" id="type" value="group" checked="true"><br>
+	Events <input type="radio" name="type" id="type" value="event"><br>
+	EveryWhere Events <input type="radio" name="type" id="type" value="everywhere_events"><br><br>
+	<script type="text/javascript">
+		var api = getAPIcookie();
+		document.write('API Key <input type="text" id="api_key" value="' + api +'" /><br>');
+	</script>
+	Save API Key?
+	<br>
+	<input type="radio" name="save" id="save_api" value="yes" checked="true"/> Yes
+	<br>
+	<input type="radio" name="save" id="save_api" value="no" /> No
+	<br>
+	<br>
+	<input type="button" value="Show Map!" onclick="find_close_groups()" />
+	<br>
+</form>
+
+<br><br><br>
+<div id="MEETUP_WIDGET_28" class="MEETUP_WIDGET">
+	<div class="MEETUP_WIDGET_body">
+		<div class="MEETUP_WIDGET_total">
+
+				<span class="MEETUP_WIDGET_title">
+
+					<span class="MEETUP_WIDGET_name"> </span>
+					<span class="MEETUP_WIDGET_suffix"> 
+						<div id="title"></div>
+						<div id="city"></div>
+					</span>
+				</span>
+
+			
+				<div class="MEETUP_WIDGET_map" id="map_canvas" style="width:100%; height:75%"></div>
+			
+		</div>
+		<div class="MEETUP_WIDGET_nearby">
+			<div class="MEETUP_WIDGET_title" id="topics_title">
+			
+			</div>
+			<div class="MEETUP_WIDGET_nearby_list" id="topics">
+				
+				
+			</div>
+		</div>
+		<a href="http://www.meetup.com/" class="MEETUP_WIDGET_logo">
+			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_WIDGET_bottom_logo"  />
+		</a>
+	</div>
+</div>
+</body>
+</html>
+
