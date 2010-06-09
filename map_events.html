@@ -153,19 +153,19 @@
 <script src="saveApiKey.js"></script>
 <script type="text/javascript">
 
-var adress;
-
-function distance(lat1, lon1, lat2, lon2) {
-	var R = 6371; // km
-	var dLat = (lat2-lat1)*(Math.PI / 180);
-	var dLon = (lon2-lon1)*(Math.PI / 180); 
-	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-	        Math.cos(lat1) * Math.cos(lat2) * 
-	        Math.sin(dLon/2) * Math.sin(dLon/2); 
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-	var d = R * c * 0.621371192;
-	return d
-}    
+	var adress;
+	
+	function distance(lat1, lon1, lat2, lon2) {
+		var R = 6371; // km
+		var dLat = (lat2-lat1)*(Math.PI / 180);
+		var dLon = (lon2-lon1)*(Math.PI / 180); 
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		        Math.cos(lat1) * Math.cos(lat2) * 
+		        Math.sin(dLon/2) * Math.sin(dLon/2); 
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		var d = R * c * 0.621371192;
+		return d
+	}    
 
 
   	function find_close_groups() {
@@ -191,10 +191,10 @@ function distance(lat1, lon1, lat2, lon2) {
 	
 		//create map
 		var map = new google.maps.Map(document.getElementById("map_canvas"), {
-      			zoom: 15,
-      			center: new google.maps.LatLng(0,0),
-      			mapTypeId: google.maps.MapTypeId.ROADMAP
-    		});
+      		zoom: 15,
+      		center: new google.maps.LatLng(0,0),
+      		mapTypeId: google.maps.MapTypeId.ROADMAP
+    	});
 	
 
 			
@@ -235,7 +235,7 @@ function distance(lat1, lon1, lat2, lon2) {
 										//provide link for each point with event info
 						  				google.maps.event.addListener(marker, 'click', function() {
 						    					var link = '<h3><a href="' + ev.event_url + '" style="color:Blue" >' + ev.name + '</a></h3> ' + ev.time + '<br><center><img src="' +  ev.photo_url +  '" alt="" /></center><br>' + ev.description;
-					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' ' +  '</p>';
+					  	    					var loc = '<p>' + ev.venue_city + ', ' + ev.venue_state + ' ' +  '</p>' + ev.group_name + '<br>';
 												
 				 		     					var win = new google.maps.InfoWindow({
 					  	      						content: link + loc,
