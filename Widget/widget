@@ -7,6 +7,7 @@ var map_temp = "";
 var map_pic = "";
 var webaddress = "";
 var groupcount = 0;
+var peoplecount = 0;
 var formattedname = "";
 var place = "";
 
@@ -30,7 +31,13 @@ size = gup("size");
 var groupname = gup("name");
 var key = gup("key");
 
-
+$.getJSON("http://api.meetup.com/ew/containers?urlname="+ groupname +"&key="+key+"&fields=member_count&callback=?", function(data) {
+	if (data.status && data.status.match(/^200/) == null) {
+       		alert(data.status + ": " + data.details);
+      	} else {
+		peoplecount_area = peoplecount_area.concat("<span class=techcrunch\"MEETUP_EVERYWHERE_WIDGET_people\">"+data.results[0].member_count+" People</span>");
+	}
+});
 
 $.getJSON("http://api.meetup.com/ew/events?order=time&urlname="+ groupname +"&key="+key+"&callback=?", function(data) {
 	if (data.status && data.status.match(/^200/) == null) {
@@ -43,7 +50,6 @@ $.getJSON("http://api.meetup.com/ew/events?order=time&urlname="+ groupname +"&ke
 				formattedname = ev.container.name;
 				webaddress = "http://www.meetup.com/"+formattedname+"/";
 				groupname_area = groupname_area.concat("<span class=\"MEETUP_EVERYWHERE_WIDGET_count\">"+groupcount+" </span><span class=\"MEETUP_EVERYWHERE_WIDGET_name\">"+ formattedname +" </span><span class=\"MEETUP_EVERYWHERE_WIDGET_suffix\">  Meetups</span>");
-				peoplecount_area = peoplecount_area.concat("<span class=techcrunch\"MEETUP_EVERYWHERE_WIDGET_people\">2,213 People</span>");
 				logo_area = logo_area.concat("<a class=\"MEETUP_EVERYWHERE_WIDGET_logo\" href=\"" + ev.meetup_url + "\"><img class=\"MEETUP_EVERYWHERE_WIDGET_bottom_logo\" src=\"http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png\"/></a>");
 				//FORMAT TIME AND DATE
 				var myDate = new Date( ev.time);

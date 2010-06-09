@@ -144,6 +144,9 @@ cursor: pointer;
 cursor: hand;
 }
 .MEETUP_WIDGET_map{
+
+}
+.MEETUP_WIDGET_map{
 a:link {text-decoration: none}
 a:visited {text-decoration: none}html small text
 a:active {text-decoration: none}
@@ -174,6 +177,8 @@ $(function() {
 
 	var target = $('#results');
 	var zip = gup("zip");
+	var city;
+	var state;
 	var radius = gup("radius");
 	var key = gup("key");
 	var result_table = new Array();
@@ -197,7 +202,6 @@ $(function() {
 		  	zip_lat = results[0].geometry.location.lat();
 			zip_lon = results[0].geometry.location.lng();
 			map.setCenter(results[0].geometry.location);
-			
 		}
 	});
 
@@ -478,7 +482,6 @@ function sortFunction(a,b) {
 
 			</div>
 		</div>
-		<br>
 		<a href="http://www.meetup.com/TechCrunch/" class="MEETUP_EVERYWHERE_WIDGET_logo">
 			<img src="http://img1.meetupstatic.com/84869143793177372874/img/birddog/everywhere_widget.png" class="MEETUP_EVERYWHERE_WIDGET_bottom_logo">
 		</a>
