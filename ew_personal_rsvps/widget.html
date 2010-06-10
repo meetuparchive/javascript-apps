@@ -1,0 +1,222 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>Test Everywhere API</title>
+	<link rel=styleSheet href="style.css" type="text/css" media=screen>
+	<script src="http://www.google.com/jsapi"></script>
+	<script>
+	  // Load jQuery
+	  google.load("jquery", "1");
+	</script>
+	<script src="saveApiKey.js"></script>
+	<script type="text/javascript">
+	function reload() {
+		//alert($('a #adlib').html());
+
+		$('.MEETUP_EVERYWHERE_WIDGET_upcoming_list').empty();
+		
+		//check if a cookie is needed
+		checkAddCookie($('#api_key').val(), document.submitform.save[0].checked);
+		
+		/* Date Formatting */
+		var lookupDay = new Array("Sun","Mon","Tue","Wed","Thurs","Fri");
+		var lookupMonth = new Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		var lookupHour = new Array('1','2','3','4','5','6','7','8','9','10','11','12','1','2','3','4','5','6','7','8','9','10','11','12');
+		
+		var $api_key = $('#api_key');
+		var dev = false;
+		var devUrl = '';
+		if(dev) {
+			devUrl = 'dev.'
+		} else {
+			devUrl = '';
+		}
+		
+		// Get my own member_id associated with my API-key
+		$.getJSON('http://api.' + devUrl + 'meetup.com/members.json?callback=?&relation=self&key=' + $api_key.val(), function(json){
+			var member_id = json.results[0].id;
+		
+			// Get all events to which I've RSVP'd
+			$.getJSON('http://api.' + devUrl + 'meetup.com/ew/rsvps.json?callback=?&member_id=' + member_id + '&key=' + $api_key.val(), function(json){
+				var events_query = '';
+				for (var i in json.results) {
+					events_query += json.results[i].event_id + ',';
+				}
+				events_query = events_query.substring(0, (events_query.length - 1));
+			
+				// Get event details for events to which I've RSVP'd
+				$.getJSON('http://api.' + devUrl + 'meetup.com/ew/events?callback=?&event_id=' + events_query + '&fields=rsvp_count' + '&key=' + $api_key.val(), function(json){
+					$(document).ready(function(){
+						
+						for (var i in json.results) {
+							
+							var meetup_url = json.results[i].meetup_url;
+							
+							/* WHEN */
+							var when = new Date(json.results[i].time);
+							//console.log('when: ' + when);
+							
+							var hours, ampm;
+							if((hours = when.getHours()) <= '11') {
+								ampm = 'AM';
+							} else {
+								ampm = 'PM';
+							}
+							
+							var minutes;
+							if((minutes = when.getMinutes()) < '10') {
+								minutes = '0' + minutes;
+							}
+
+							var date = lookupMonth[when.getMonth()] + ' ' + when.getDate();
+							var day = lookupDay[when.getDay()];
+							var time = lookupHour[hours] + ':' + minutes + ' ' + ampm;
+							
+							var ew_name = json.results[i].container.name;
+							
+							var address = json.results[i].address1;
+							if (address == null) {
+								address = 'TBD';
+							}
+							
+							/* HOVER DIALOG DATA */
+							var hdata = new Array();
+							
+							// Venue
+							if(json.results[i].venue_name != null) {
+								var venue_name = '<span>' + json.results[i].venue_name + '</span>';
+								hdata.push(venue_name);
+							}
+							
+							// Description
+							if(json.results[i].description != null) {
+								var description = '<span>' + json.results[i].description + '</span>';
+								hdata.push(description)
+							}
+							
+							var tooltipHtml = hdata.join('');
+							
+							$('.MEETUP_EVERYWHERE_WIDGET_upcoming_list').append
+								(	
+									'<a id="adlib" href="' + meetup_url + '">' + '\n' +
+										'<span class="when birddogData">' + '\n' +
+											'<span class="date">' + day + '</span>' + '\n' +
+											'<span class="date">' + date + '</span>' + '\n' +
+											'<span class="time">' + time + '</span>' + '\n' +
+										'</span>' + '\n' +
+										'<span class="loc birddogData">' + '\n' +
+											'<span class="city linked">' + ew_name + '</span>' + '\n' +
+											'<span class="address">' + address + '</span>' + '\n' +
+										'</span>' + '\n' +
+										'<span class="tooltip">' + tooltipHtml + '</span>' + '\n' +
+									'</a>'
+								);
+						}
+						TT.setTips();
+					});
+				});
+			
+			});
+		
+		});
+	
+		/* TT */
+		var TT = {
+			delay: 600,
+		
+			setTips: function(){
+			
+				$('.tooltip').parent().hover(function(){
+				
+					// Store the tooltip being hovered
+					TT.current = $(this);
+				
+					TT.timer = setTimeout(function(){
+						// Find the tooltip
+						TT.current.find('.tooltip').fadeIn('fast');
+					}, TT.delay);	
+				}, function(){
+				// On mouseout, clear timer and hide tooltip
+				clearTimeout(TT.timer);
+				$(this).find('.tooltip').fadeOut('fast');
+				}).attr('title', '') // Clear the title to stop browser tooltips
+			
+				var screenWidth = $(window).width();
+				var screenBottom = $(window).scrollTop() + $(window).height();
+			
+				$('.tooltip').each(function(){
+					// Grab the containing element
+					$container = $(this).parent();
+				
+					// Give it relative position if required
+					if ($container.css('position') != 'absolute'
+							&& $container.css('position') != 'fixed') {
+						$container.css({position: 'relative'});
+					}
+					
+					var height = $(this).height();
+					var width = $(this).outerWidth();
+
+					var position = $container.position();
+					console.log('position: ' + position.toSource());
+				
+					// Now position the tip
+					var top = 0;
+					var left = width - position.left;
+				
+					// finally set the css properties to position onscreen
+					$(this).css({
+						'top': top,
+						'left': left,
+					});
+				});
+			}
+		};	
+	
+	}
+	</script>
+</head>
+<body>
+	<form name="submitform">
+		<script type="text/javascript">
+			var api = getAPIcookie();
+			document.write('API Key <input type="text" id="api_key" value="' + api +'" /><br>');
+		</script>
+		Save API Key?
+		<br>
+		<input type="radio" name="save" id="save_api" value="yes" /> Yes
+		<br>
+		<input type="radio" name="save" id="save_api" value="no" /> No
+		<br>
+		<input type="button" value="Load" onclick="reload()" />
+		<br>
+	</form>
+	
+	<div id="MEETUP_EVERYWHERE_WIDGET_birddogid" class="MEETUP_EVERYWHERE_WIDGET">
+		<div id="MEETUP_EVERYWHERE_WIDGET_birddogid_content">
+			<div class="MEETUP_EVERYWHERE_WIDGET_birddogid_content_body">
+				<!-- Make dynamic from json result -->
+				<a href="#">
+					<span class="MEETUP_EVERYWHERE_WIDGET_title">
+						<span class="MEETUP_EVERYWHERE_WIDGET_name">My Upcoming Meetups</span>
+						<!-- <span class="MEETUP_EVERYWHERE_WIDGET_suffix">Placeholder</span> -->
+					</span>
+					<!-- <span class="MEETUP_EVERYWHERE_WIDGET_people">x confirmed...</span> -->
+				</a>
+				<span class="MEETUP_EVERYWHERE_WIDGET_subtitle">
+					<span class="MEETUP_EVERYWHERE_WIDGET_count"></span>
+					<span class="MEETUP_EVERYWHERE_WIDGET_people"></span>
+				</span>
+				<div class="MEETUP_EVERYWHERE_WIDGET_upcoming">
+					<div class="MEETUP_EVERYWHERE_WIDGET_upcoming_list">
+						
+					</div>
+				</div>
+				<a class="MEETUP_EVERYWHERE_WIDGET_logo" href="http://www.dev.meetup.com/everywhere">
+						<img class="MEETUP_EVERYWHERE_WIDGET_bottom_logo" src="http://img2.dev.meetupstatic.com/img/birddog/everywhere_widget.png" />
+				</a>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
