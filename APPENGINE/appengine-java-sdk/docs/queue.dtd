@@ -1,0 +1,6 @@
+<!ELEMENT queue-entries (queue)*>
+<!ELEMENT total-storage-limit (#PCDATA)>
+<!ELEMENT queue (name, rate, bucket-size)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT rate (#PCDATA)>
+<!ELEMENT bucket-size (#PCDATA)>

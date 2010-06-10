@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+  <servlet>
+    <servlet-name>counter-v1</servlet-name>
+    <servlet-class>
+      com.google.appengine.demos.shardedcounter.v1.CounterPage
+    </servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>counter-v2</servlet-name>
+    <servlet-class>
+      com.google.appengine.demos.shardedcounter.v2.CounterPage
+    </servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>counter-v3</servlet-name>
+    <servlet-class>
+      com.google.appengine.demos.shardedcounter.v3.CounterPage
+    </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>counter-v1</servlet-name>
+    <url-pattern>/v1</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>counter-v2</servlet-name>
+    <url-pattern>/v2</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>counter-v3</servlet-name>
+    <url-pattern>/v3</url-pattern>
+  </servlet-mapping>
+</web-app>
+
