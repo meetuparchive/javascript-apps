@@ -31,6 +31,8 @@ size = gup("size");
 var groupname = gup("name");
 var key = gup("key");
 
+
+
 $.getJSON("http://api.meetup.com/ew/containers?urlname="+ groupname +"&key="+key+"&fields=member_count&callback=?", function(data) {
 	if (data.status && data.status.match(/^200/) == null) {
        		alert(data.status + ": " + data.details);

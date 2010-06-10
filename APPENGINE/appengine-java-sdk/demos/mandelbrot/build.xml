@@ -1,0 +1,58 @@
+<project name="mandelbrot" default="compile">
+  <property name="sdk.dir" location="../.." />
+
+  <import file="${sdk.dir}/config/user/ant-macros.xml" />
+
+  <path id="project.classpath">
+    <pathelement path="www/WEB-INF/classes" />
+    <fileset dir="www/WEB-INF/lib">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${sdk.dir}/lib">
+      <include name="shared/**/*.jar" />
+    </fileset>
+  </path>
+
+  <target name="copyjars"
+      description="Copies the App Engine JARs to the WAR.">
+    <mkdir dir="www/WEB-INF/lib" />
+    <copy
+        todir="www/WEB-INF/lib"
+        flatten="true">
+      <fileset dir="${sdk.dir}/lib/user">
+        <include name="**/*.jar" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" depends="copyjars"
+      description="Compiles Java source and copies other source files to the WAR.">
+    <mkdir dir="www/WEB-INF/classes" />
+    <copy todir="www" includeEmptyDirs="false">
+      <fileset dir="src">
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac
+        srcdir="src"
+        destdir="www/WEB-INF/classes"
+        classpathref="project.classpath"
+        debug="on" />
+  </target>
+
+  <target name="runserver" depends="compile"
+      description="Starts the development server.">
+    <dev_appserver war="www" />
+  </target>
+
+  <target name="update" depends="compile"
+      description="Uploads the application to App Engine.">
+    <appcfg action="update" war="www" />
+  </target>
+
+  <target name="rollback" depends="compile"
+      description="Rolls back an interrupted application update.">
+    <appcfg action="rollback" war="www" />
+  </target>
+
+</project>
