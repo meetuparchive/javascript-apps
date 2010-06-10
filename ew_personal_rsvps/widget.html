@@ -96,19 +96,21 @@
 							var tooltipHtml = hdata.join('');
 							
 							$('.MEETUP_EVERYWHERE_WIDGET_upcoming_list').append
-								(	
-									'<a id="adlib" href="' + meetup_url + '">' + '\n' +
-										'<span class="when birddogData">' + '\n' +
-											'<span class="date">' + day + '</span>' + '\n' +
-											'<span class="date">' + date + '</span>' + '\n' +
-											'<span class="time">' + time + '</span>' + '\n' +
-										'</span>' + '\n' +
-										'<span class="loc birddogData">' + '\n' +
-											'<span class="city linked">' + ew_name + '</span>' + '\n' +
-											'<span class="address">' + address + '</span>' + '\n' +
-										'</span>' + '\n' +
-										'<span class="tooltip">' + tooltipHtml + '</span>' + '\n' +
-									'</a>'
+								(
+									'<span class="listitem">\n' +
+									'<a href="' + meetup_url + '">\n' +
+										'<span class="when birddogData">\n' +
+											'<span class="date">' + day + '</span>\n' +
+											'<span class="date">' + date + '</span>\n' +
+											'<span class="time">' + time + '</span>\n' +
+										'</span>\n' +
+										'<span class="loc birddogData">\n' +
+											'<span class="city linked">' + ew_name + '</span>\n' +
+											'<span class="address">' + address + '</span>\n' +
+										'</span>\n' +
+									'</a>\n' +
+									'<span class="tooltip">' + tooltipHtml + '</span>\n' +
+									'</span>'
 								);
 						}
 						TT.setTips();

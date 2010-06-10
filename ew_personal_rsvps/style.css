@@ -58,6 +58,9 @@ a :active{
 	display: block;
 	background: #333;
 }
+.listitem{
+	display:block;
+}
 .MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a {
 	zoom: 1;
     border-top: 1px solid #1a1a1a!important; 
