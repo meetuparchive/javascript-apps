@@ -29,7 +29,7 @@ public class TestPage extends HttpServlet {
 		prop.setProperty("request.token.url","http://www.meetup.com/oauth/request/");
 		prop.setProperty("access.token.verb","POST");
 		prop.setProperty("access.token.url","http://www.meetup.com/oauth/access/");
-		prop.setProperty("callback.url","http://localhost:8080/test");
+		prop.setProperty("callback.url",req.getRequestURL().toString());
 
 		//Create scribe object
 		Scribe scribe = new Scribe(prop);
@@ -100,7 +100,7 @@ public class TestPage extends HttpServlet {
 	}
 
 	//Parses a given query string and returns the value of reqVar, if it exists
-	public String getArg(String reqVar, String query) {
+	public static String getArg(String reqVar, String query) {
 		StringTokenizer st = new StringTokenizer(query,"&");
 		while (st.hasMoreTokens()) {
 			String temp = st.nextToken();

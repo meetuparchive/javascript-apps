@@ -29,7 +29,7 @@ public class TestPage extends HttpServlet {
 		prop.setProperty("request.token.url","http://www.meetup.com/oauth/request/");
 		prop.setProperty("access.token.verb","POST");
 		prop.setProperty("access.token.url","http://www.meetup.com/oauth/access/");
-		prop.setProperty("callback.url","http://localhost:8080/test");
+		prop.setProperty("callback.url",req.getRequestURL().toString());
 
 		//Create scribe object
 		Scribe scribe = new Scribe(prop);
@@ -75,7 +75,7 @@ public class TestPage extends HttpServlet {
 			}
 			finally {
 				query.closeAll();
-				resp.sendRedirect(resp.encodeRedirectURL("/meetup"+finalDirect));
+				resp.sendRedirect("/meetup"+finalDirect);
 			}
 			
 			
