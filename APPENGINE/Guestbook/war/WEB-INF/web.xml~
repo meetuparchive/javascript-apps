@@ -13,6 +13,37 @@
 		<url-pattern>/guestbook</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
-		<welcome-file>guestbook.jsp</welcome-file>
+		<welcome-file>/test</welcome-file>
 	</welcome-file-list>
+
+    	<servlet>
+        	<servlet-name>sign</servlet-name>
+        	<servlet-class>guestbook.SignGuestbookServlet</servlet-class>
+    	</servlet>
+    	<servlet-mapping>
+        	<servlet-name>sign</servlet-name>
+        	<url-pattern>/sign</url-pattern>
+    	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>guestbook.TestPage</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+        	<url-pattern>/test</url-pattern>
+    	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>meetup</servlet-name>
+		<servlet-class>guestbook.MeetupServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>meetup</servlet-name>
+        	<url-pattern>/meetup</url-pattern>
+    	</servlet-mapping>
+
+
 </web-app>

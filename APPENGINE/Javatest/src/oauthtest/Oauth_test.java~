@@ -1,0 +1,9 @@
+package oauthtest;
+
+public class Oauth_test {
+
+	public static void Main(String args[]) {
+		System.out.println("Hello World");
+	}
+
+}

@@ -21,6 +21,9 @@
       <fileset dir="${sdk.dir}/lib/user">
         <include name="**/*.jar" />
       </fileset>
+      <fileset dir="lib">
+	<include name="**/*.jar" />
+      </fileset>
     </copy>
   </target>
 
