@@ -25,5 +25,15 @@
         	<url-pattern>/sign</url-pattern>
     	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>guestbook.TestPage</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+        	<url-pattern>/test</url-pattern>
+    	</servlet-mapping>
+
 
 </web-app>
