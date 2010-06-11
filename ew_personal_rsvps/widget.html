@@ -39,6 +39,9 @@
 			$.getJSON('http://api.' + devUrl + 'meetup.com/ew/rsvps.json?callback=?&member_id=' + member_id + '&key=' + $api_key.val(), function(json){
 				var events_query = '';
 				for (var i in json.results) {
+					// Get comments for each event
+					//$.getJSON('http://api.' + devUrl + 'meetup.com/ew/comments?callback=?&event_id=' + json.results[i].event_id + '&page=3&offset=0&key=' + $api_key.val(), function(json){});
+					
 					events_query += json.results[i].event_id + ',';
 				}
 				events_query = events_query.substring(0, (events_query.length - 1));
@@ -46,6 +49,9 @@
 				// Get event details for events to which I've RSVP'd
 				$.getJSON('http://api.' + devUrl + 'meetup.com/ew/events?callback=?&event_id=' + events_query + '&fields=rsvp_count' + '&key=' + $api_key.val(), function(json){
 					$(document).ready(function(){
+						
+						// Get recent comments for later use in hover dialog
+						//$.getJSON('http://api.' + devUrl + 'meetup.com/ew/comments?callback=?&event_id=' + events_query + '&page=10&offset=0&key=' + $api_key.val(), function(json){});
 						
 						for (var i in json.results) {
 							
@@ -73,9 +79,9 @@
 							
 							var ew_name = json.results[i].container.name;
 							
-							var address = json.results[i].address1;
-							if (address == null) {
-								address = 'TBD';
+							var street = json.results[i].address1;
+							if (street == null) {
+								street = 'TBD';
 							}
 							
 							/* HOVER DIALOG DATA */
@@ -83,22 +89,52 @@
 							
 							// Venue
 							if(json.results[i].venue_name != null) {
-								var venue_name = '<span>' + json.results[i].venue_name + '</span>';
+								var venue_name = '<div class="address"><span class="venueName">' + json.results[i].venue_name + '</span>';
 								hdata.push(venue_name);
+							}
+							
+							// Venue Address
+							if(street != 'TBD'){
+								
+								var city = '';
+								if(json.results[i].city){
+									city = json.results[i].city;
+								}
+								
+								var state = '';
+								if(json.results[i].state){
+									state = json.results[i].state;
+								}
+								
+								var zip = '';
+								if(json.results[i].zip){
+									zip = json.results[i].zip;
+								}
+								
+								var country = '';
+								if(json.results[i].country){
+									country = json.results[i].country;
+								}
+								
+								hdata.push(address = '<span>' + street + '<br />' + city + ', ' + state + ' ' + zip + '</span><span class="getDirections"><a target="_blank" href="http://maps.google.com/maps?f=d&hl=en&saddr=&daddr=' + escape(street) + '%2C+' + escape(city) + '%2C+' + state + '+' + zip + '%2C+' + country + '">Get Directions <span class="getDirectionsGo">&rarr;</span></a></span></div>');
 							}
 							
 							// Description
 							if(json.results[i].description != null) {
-								var description = '<span>' + json.results[i].description + '</span>';
+								var description = '<div class="description">' + json.results[i].description + '</div>';
 								hdata.push(description)
 							}
 							
 							var tooltipHtml = hdata.join('');
+							console.log(tooltipHtml);
+							if (tooltipHtml != '') {
+								tooltipHtml = '<div class="tooltip event' + json.results[i].id + '">' + tooltipHtml + '</div>\n';
+							}
 							
 							$('.MEETUP_EVERYWHERE_WIDGET_upcoming_list').append
 								(
 									'<span class="listitem">\n' +
-									'<a href="' + meetup_url + '">\n' +
+									'<a class="listItemLink" href="' + meetup_url + '">\n' +
 										'<span class="when birddogData">\n' +
 											'<span class="date">' + day + '</span>\n' +
 											'<span class="date">' + date + '</span>\n' +
@@ -106,14 +142,34 @@
 										'</span>\n' +
 										'<span class="loc birddogData">\n' +
 											'<span class="city linked">' + ew_name + '</span>\n' +
-											'<span class="address">' + address + '</span>\n' +
+											'<span class="address">' + street + '</span>\n' +
 										'</span>\n' +
 									'</a>\n' +
-									'<span class="tooltip">' + tooltipHtml + '</span>\n' +
+									tooltipHtml +
 									'</span>'
 								);
+							
+							// Comments
+							$.getJSON('http://api.' + devUrl + 'meetup.com/ew/comments?callback=?&event_id=' + json.results[i].id + '&page=3&offset=0&key=' + $api_key.val(), function(json){
+								
+								if(json.results) {
+									var indComment = '';
+									indComment = '<div class="indComment">' + json.results[i].comment + '<span class="indCommentAuthor">' + json.results[i].member.name + '</span></div>\n';
+								
+									$(document).ready(function(){
+										var selector = '.event' + json.results[i].id;
+										$(selector).append
+											(
+												'<div class="comments">\n' +
+													indComment +
+												'</div>\n'
+											)
+									})
+								}
+							});
 						}
 						TT.setTips();
+
 					});
 				});
 			
@@ -156,14 +212,14 @@
 					}
 					
 					var height = $(this).height();
-					var width = $(this).outerWidth();
+					var width = $(this).width();
 
 					var position = $container.position();
 					console.log('position: ' + position.toSource());
 				
 					// Now position the tip
-					var top = 0;
-					var left = width - position.left;
+					var top = .5;
+					var left = width - position.left - 7;
 				
 					// finally set the css properties to position onscreen
 					$(this).css({

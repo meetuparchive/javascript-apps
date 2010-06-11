@@ -61,7 +61,7 @@ a :active{
 .listitem{
 	display:block;
 }
-.MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a {
+a.listItemLink {
 	zoom: 1;
     border-top: 1px solid #1a1a1a!important; 
     padding: 8px 10px; 
@@ -73,24 +73,24 @@ a :active{
 // .MEETUP_EVERYWHERE_WIDGET_upcoming_list span .tooltip span a {
 // 	display: inline;
 // }
-.MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a:after {
+a.listItemLink:after {
   content: ".";
   display: block;
   height: 0;
   clear: both;
   visibility: hidden;
 }
-.MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a:hover {
+a.listItemLink:hover {
 	background: #a3e4ff; 
     color: #3c3633 !important;
 }
-.MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a{
+a.listItemLink{
 	padding: 6px 6px;
 }
-.MEETUP_EVERYWHERE_WIDGET_upcoming .MEETUP_EVERYWHERE_WIDGET_upcoming_list a .MEETUP_EVERYWHERE_WIDGET_all{
+a.listItemLink .MEETUP_EVERYWHERE_WIDGET_all{
 	display: block;
 	text-align: right;
-	display: block;	
+	display: block;
 	font-family: arial, sans-serif;
 	font-weight: bold;
 	/*
@@ -126,7 +126,7 @@ a :active{
 .MEETUP_EVERYWHERE_WIDGET_bottom_logo{
 	margin-top: 8px;
 }
-span.tooltip {
+.tooltip {
   background-color: #333333;
   color: #ffffff;
   font: 12px normal Helvetica,Arial,Verdana,sans-serif;
@@ -134,11 +134,49 @@ span.tooltip {
   position: absolute;
   text-align: left;
   line-height:1.5em;
-  // white-space: nowrap;
+  /*white-space: nowrap;*/
   width: 200px;
   z-index: 100;
+  padding:6px 10px;
 }
-span.tooltip span {
-  display: block;
-  padding:8px 10px;
+.venueName {
+	display:block;
+	font-weight:bold;
+}
+.venueLocation {
+	font-weight:normal;
+}
+.address, .description {
+	margin-bottom:1em;
+}
+.getDirections {
+	display:block;
+	font-family:arial,sans-serif;
+	font-size:11px;
+	font-weight:bold;
+	text-align:left;
+}
+.getDirectionsGo {
+	background-color: #ca3e47;
+	background-image: -moz-linear-gradient(top, #ca3e47,	#a8252e);
+	background-image: -webkit-gradient(linear,left bottom,left top,color-stop(0, #a8252e),color-stop(1, #ca3e47));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ca3e47', endColorstr='#a8252e');
+	border: 2px solid #a8252e;
+	-moz-border-radius: 4px 4px 4px 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px 4px 4px 4px;
+	text-shadow: black 0px 0px 2px;
+	zoom: 1;
+	display: inline;
+	display: inline-block;
+	text-align: center;
+	font-weight: bold;
+	font-size: 15px;
+	margin-left: 2px;
+	line-height: .75em;
+	color: #fff!important;
+	font-family: arial;
+	padding: 0px 4px;
+	cursor: pointer;
+	cursor: hand;
 }
