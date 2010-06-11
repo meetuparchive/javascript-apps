@@ -21,9 +21,17 @@ public class MeetupUser {
 	@Persistent
 	private String reqTokenSecret;
 
+	@Persistent
+	private String accToken;
+
+	@Persistent
+	private String accTokenSecret;
+
 	public MeetupUser() {
 		reqToken = null;
 		reqTokenSecret = null;
+		accToken = null;
+		accTokenSecret = null;
 	}
 
    	public Key getKey() {
@@ -44,6 +52,23 @@ public class MeetupUser {
 
 	public void setReqTokenSecret(String a) {
 		reqTokenSecret = a;
+	}
+
+
+	public String getAccToken() {
+		return accToken;
+	}
+
+	public String getAccTokenSecret() {
+		return accTokenSecret;
+	}
+
+	public void setAccToken(String r) {
+		accToken = r;
+	}
+
+	public void setAccTokenSecret(String a) {
+		accTokenSecret = a;
 	}
 
 }

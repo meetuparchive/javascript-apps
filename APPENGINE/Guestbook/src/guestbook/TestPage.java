@@ -1,8 +1,11 @@
 package guestbook;
 
+import com.google.appengine.api.datastore.Key;
+
 import java.io.IOException;
 import javax.servlet.http.*;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Transaction;
 import javax.jdo.Query;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -34,11 +37,13 @@ public class TestPage extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		if (req.getQueryString() != null) {  //If access key is obtained
-			resp.setContentType("text/plain");
-			resp.getWriter().println(req.getQueryString());
+			//resp.setContentType("text/plain");
+			//resp.getWriter().println(req.getQueryString());
 			
 			String token = getArg("oauth_token",req.getQueryString());
 			String verify = getArg("oauth_verifier",req.getQueryString());
+
+			String finalDirect = "?";
 			Token requestToken = null;
 			//resp.getWriter().println(token);
 			//resp.getWriter().println(verify);
@@ -46,18 +51,31 @@ public class TestPage extends HttpServlet {
 			Query query = pm.newQuery(MeetupUser.class);
 			query.setFilter("reqToken == reqTokenParam");
 			query.declareParameters("String reqTokenParam");
+
+			Transaction tx = pm.currentTransaction();
 			try {
+				tx.begin();
 				List<MeetupUser> users = (List<MeetupUser>) query.execute(token);
 				if (users.iterator().hasNext()) {
 					requestToken = new Token(users.get(0).getReqToken(),users.get(0).getReqTokenSecret());
-
 					Token accessToken = scribe.getAccessToken(requestToken, verify);
-
-					resp.getWriter().println(accessToken.toString());
+					users.get(0).setAccToken(accessToken.getToken());
+					users.get(0).setAccTokenSecret(accessToken.getSecret());
+					//resp.getWriter().println(accessToken.toString());
+					//finalDirect = "?"+users.get(0).getKey().getId();
+					finalDirect = "?" + users.get(0).getAccToken();
 				}
 				
-			} finally {
+
+				tx.commit();
+			} catch (Exception e) {
+				if (tx.isActive()) {
+					tx.rollback();
+				}
+			}
+			finally {
 				query.closeAll();
+				resp.sendRedirect("/meetup"+finalDirect);
 			}
 			
 			
