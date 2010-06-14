@@ -57,11 +57,13 @@ public class MeetupServlet extends HttpServlet {
 					json = new JSONObject(response.getBody());
 					String[] names = JSONObject.getNames(json.getJSONArray("results").getJSONObject(0));
 
-					for (int i = 0; i < names.length; i++) {
-						String temp = json.getJSONArray("results").getJSONObject(0).getString(names[i]);
-						resp.getWriter().println(names[i]+": "+temp);
-					}	
-
+					for (int j = 0; j < json.getJSONArray("results").length(); j++) {
+						resp.getWriter().println("["+j+"]:");
+						for (int i = 0; i < names.length; i++) {
+							String temp = json.getJSONArray("results").getJSONObject(j).getString(names[i]);
+							resp.getWriter().println(names[i]+": "+temp);
+						}	
+					}
 
 
 

@@ -18,6 +18,7 @@ import org.apache.commons.codec.*;
 import guestbook.MeetupUser;
 import guestbook.PMF;
 
+import javax.servlet.http.Cookie;
 
 public class TestPage extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -37,16 +38,11 @@ public class TestPage extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		if (req.getQueryString() != null) {  //If access key is obtained
-			//resp.setContentType("text/plain");
-			//resp.getWriter().println(req.getQueryString());
-			
+
 			String token = getArg("oauth_token",req.getQueryString());
 			String verify = getArg("oauth_verifier",req.getQueryString());
 
-			String finalDirect = "?";
 			Token requestToken = null;
-			//resp.getWriter().println(token);
-			//resp.getWriter().println(verify);
 
 			Query query = pm.newQuery(MeetupUser.class);
 			query.setFilter("reqToken == reqTokenParam");
@@ -61,9 +57,10 @@ public class TestPage extends HttpServlet {
 					Token accessToken = scribe.getAccessToken(requestToken, verify);
 					users.get(0).setAccToken(accessToken.getToken());
 					users.get(0).setAccTokenSecret(accessToken.getSecret());
-					//resp.getWriter().println(accessToken.toString());
-					//finalDirect = "?"+users.get(0).getKey().getId();
-					finalDirect = "?" + users.get(0).getAccToken();
+
+					//SETCOOKIE
+					Cookie c = new Cookie("meetup_access", accessToken.getToken());
+      					resp.addCookie(c);
 				}
 				
 
@@ -75,7 +72,7 @@ public class TestPage extends HttpServlet {
 			}
 			finally {
 				query.closeAll();
-				resp.sendRedirect("/meetup"+finalDirect);
+				resp.sendRedirect("/widget.jsp");
 			}
 			
 			
