@@ -1,9 +1,0 @@
-package guestbook;
-
-import com.google.appengine.api.oauth.*;
-import com.google.appengine.api.users.User;
-
-public class MeetupOAuthService implements OAuthService {
-
-
-}
