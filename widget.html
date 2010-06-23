@@ -1,0 +1,30 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script src="template.js"></script>
+<script>
+  var github = "http://github.com/api/v2/json/";
+  var widgetrepo = "javascript-apps";
+  var cbq = "?callback=?";
+  $(function() {
+    $.getJSON(github + "commits/list/meetup/" + widgetrepo + "/master" + cbq, function(json) {
+      var head = json.commits[0].id
+      $.getJSON(github + "tree/show/meetup/" + widgetrepo + "/" + head + cbq, function(json) {
+        $.each(json.tree, function(i, item) {
+          if (item.name.match(/.html$/))
+            $.getJSON(github + "blob/show/meetup/" + widgetrepo + "/" + head + "/" + item.name + cbq, function(json) {
+              $("#results").append(parseTemplate($("#listing").html(), json.blob));
+            });
+        });
+      });
+    });
+  });
+</script>
+<script id="listing" type="text/html">
+  <h3><#= name #></h3>
+  <textarea><#= data #></textarea> 
+</script>
+<body>
+  <div id="results"></div>
+</body>
+</html>
