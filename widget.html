@@ -2,6 +2,7 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="template.js"></script>
+<script src="htmlparser.js"></script>
 <script src="api_key.js"></script>
 <script>
   function api_call(path, params) {
@@ -10,7 +11,6 @@
   var github = "http://github.com/api/v2/json/";
   var widgetrepo = "widgets";
   var cbq = "?callback=?";
-  var config_re = /\/\/ *widget config/
   $(function() {
     $.getJSON(github + "commits/list/meetup/" + widgetrepo + "/master" + cbq, function(json) {
       var head = json.commits[0].id
@@ -18,13 +18,33 @@
         $.each(json.tree, function(i, item) {
           if (item.name.match(/.html$/))
             $.getJSON(github + "blob/show/meetup/" + widgetrepo + "/" + head + "/" + item.name + cbq, function(json) {
-              var parts = json.blob.data.split(config_re)
-              if (parts.length == 3) {
-                eval(parts[1]);
-                for (i in $queries)
-                  alert("query: " + i + " is " + $queries[i]());
-                $("#results").append(parseTemplate($("#listing").html(), json.blob));
-              }
+              var results = "";
+              var config = "";
+              HTMLParser(json.blob.data, {
+                start: function( tag, attrs, unary ) {
+                  var src = $.grep(attrs, function(attr) { return attr.name == "src" } )[0];
+                  var id = $.grep(attrs, function(attr) { return attr.name == "id" } )[0];
+                  if (tag == "script" && src && !src.value.match(/^http/)) {
+                    this.chars = $.noop;
+                    this.end = $.noop;
+                  } else if (tag == "script" && id && id.value == "config") {
+                    this.chars = function(text) {
+                      config = text;
+                      results += "<!--widget-config-->"
+                      this.chars = $.noop;
+                    };
+                    this.end = $.noop;
+                  } else {
+                    this.chars = function(text) { results += text; };
+                    this.end = function( tag ) { results += "</" + tag + ">"; };
+                    results += "<" + tag;
+                    for ( var i = 0; i < attrs.length; i++ )
+                      results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
+                    results += (unary ? "/" : "") + ">";
+                  }
+                }
+              });
+              $("#results").append(parseTemplate($("#listing").html(), { name: json.blob.name, body: results }));
             });
         });
       });
@@ -33,7 +53,7 @@
 </script>
 <script id="listing" type="text/html">
   <h3><#= name #></h3>
-  <textarea><#= data #></textarea> 
+  <textarea><#= body #></textarea> 
 </script>
 <body>
   <div id="results"></div>
