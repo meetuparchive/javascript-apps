@@ -3,6 +3,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="template.js"></script>
 <script src="htmlparser.js"></script>
+<script src="json2.js"></script>
 <script src="api_key.js"></script>
 <script>
   function api_call(path, params) {
@@ -20,6 +21,7 @@
             $.getJSON(github + "blob/show/meetup/" + widgetrepo + "/" + head + "/" + item.name + cbq, function(json) {
               var results = "";
               var config = "";
+              var MARKER = "<!--widget-config-->";
               HTMLParser(json.blob.data, {
                 start: function( tag, attrs, unary ) {
                   var src = $.grep(attrs, function(attr) { return attr.name == "src" } )[0];
@@ -30,7 +32,7 @@
                   } else if (tag == "script" && id && id.value == "config") {
                     this.chars = function(text) {
                       config = text;
-                      results += "<!--widget-config-->"
+                      results += MARKER;
                       this.chars = $.noop;
                     };
                     this.end = $.noop;
@@ -44,16 +46,47 @@
                   }
                 }
               });
-              $("#results").append(parseTemplate($("#listing").html(), { name: json.blob.name, body: results }));
+              eval(config);
+              var params = "";
+              for (name in $parameters) {
+                params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
+              }
+              var listing = $(parseTemplate($("#listing").html(), { 
+                name: json.blob.name, params: params, body: results
+              }));
+              $("#results").append(listing);
+              var sync = function() {
+                $parameters[this.name] = $(this).val();
+                listing.find("textarea").val(
+                  results.replace(MARKER, parseTemplate($("#config_t").html(), { 
+                    params: JSON.stringify($parameters)
+                  }))
+                );
+              };
+              listing.find("input.param").keyup(sync).each(sync);
             });
         });
       });
     });
   });
 </script>
+<script id="config_t" type="text/html">
+  <script id="config">
+    $parameters = <#= params #>;
+  </<#= "script"#>>
+</script>
+<script id="parameter" type="text/html">
+  <div>
+    <#= name #>
+    <input type="text" class="param" name="<#= name #>" value="<#= value #>" />
+  </div>
+</script>
 <script id="listing" type="text/html">
   <h3><#= name #></h3>
-  <textarea><#= body #></textarea> 
+  <form>
+    <#= params #>
+    <textarea></textarea> 
+  </form>
 </script>
 <body>
   <div id="results"></div>
