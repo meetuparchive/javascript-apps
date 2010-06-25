@@ -1,11 +1,16 @@
 <html>
 <head>
+<style>
+  textarea { width: 40em; height: 20em };
+  
+</style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="template.js"></script>
 <script src="htmlparser.js"></script>
 <script src="json2.js"></script>
 <script src="api_key.js"></script>
 <script>
+  var MARKER = "<!--widget-parameters-inserted-here-do-not-remove-->";
   var github = "http://github.com/api/v2/json/";
   var widgetrepo = "widgets";
   var cbq = "?callback=?";
@@ -14,85 +19,95 @@
       var head = json.commits[0].id
       $.getJSON(github + "tree/show/meetup/" + widgetrepo + "/" + head + cbq, function(json) {
         $.each(json.tree, function(i, item) {
-          if (item.name.match(/.html$/))
+          if (item.name.match(/.html$/)) {
             $.getJSON(github + "blob/show/meetup/" + widgetrepo + "/" + head + "/" + item.name + cbq, function(json) {
-              var results = "";
-              var config = "";
-              var MARKER = "<!--widget-config-->";
-              HTMLParser(json.blob.data, {
-                start: function( tag, attrs, unary ) {
-                  var src = $.grep(attrs, function(attr) { return attr.name == "src" } )[0];
-                  var id = $.grep(attrs, function(attr) { return attr.name == "id" } )[0];
-                  if (tag == "script" && src && !src.value.match(/^http/)) {
-                    this.chars = $.noop;
-                    this.end = $.noop;
-                  } else if (tag == "script" && id && id.value == "config") {
-                    this.chars = function(text) {
-                      config = text;
-                      results += MARKER;
-                      this.chars = $.noop;
-                    };
-                    this.end = $.noop;
-                  } else {
-                    this.chars = function(text) { results += text; };
-                    this.end = function(tag) { results += "</" + tag + ">"; };
-                    results += "<" + tag;
-                    for ( var i = 0; i < attrs.length; i++ )
-                      results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-                    results += (unary ? "/" : "") + ">";
-                  }
-                }
-              });
-              var api_call = function(path, params) {
-                return "http://api.meetup.com/" + path + "?callback=?&" + $.param($.extend({ key: $api_key, sign: true }, params));
-              };
-              eval(config);
-              var params = "";
-              for (name in $parameters) {
-                params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
-              }
               var listing = $(parseTemplate($("#listing").html(), { 
-                name: json.blob.name, 
-                params: params, 
-                body: results
+                name: json.blob.name,
+                source: json.blob.data
               }));
               $("#results").append(listing);
-              var with_html = function(block) {
-                listing.find("input.param").each(function() {
-                  $parameters[this.name] = $(this).val();
-                });
-                var lookups = 0;
-                for (i in $queries) { lookups++; }
-                var query_ary = [];
-                $.each($queries, function(name, query) {
-                  $.getJSON(query(), function(data) {
-                    var query = data.meta.signed_url.replace(/&callback=[^&]+/, '&callback=?');
-                    query_ary.push(name + ": function() { return \"" + query + "\"; }");
-                    if (query_ary.length == lookups) {
-                      block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
-                        params: JSON.stringify($parameters),
-                        queries: query_ary.join(", ")
-                      })));
-                    }
+              
+              var update_listing = function() {
+                var parsed = parse_widget($(this).val());
+                var results = parsed[0];
+                var config = parsed[1];
+                var api_call = function(path, params) {
+                  return "http://api.meetup.com/" + path + "?callback=?&" + $.param($.extend({ key: $api_key, sign: true }, params));
+                };
+                eval(config);
+                var params = "";
+                for (name in $parameters) {
+                  params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
+                }
+                listing.find("div.params").empty().append(params);
+                var with_html = function(block) {
+                  listing.find("input.param").each(function() {
+                    $parameters[this.name] = $(this).val();
                   });
+                  var lookups = 0;
+                  for (i in $queries) { lookups++; }
+                  var query_ary = [];
+                  $.each($queries, function(name, query) {
+                    $.getJSON(query(), function(data) {
+                      var query = data.meta.signed_url.replace(/&callback=[^&]+/, '&callback=?');
+                      query_ary.push(name + ": function() { return \"" + query + "\"; }");
+                      if (query_ary.length == lookups) {
+                        block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
+                          params: JSON.stringify($parameters),
+                          queries: query_ary.join(", ")
+                        })));
+                      }
+                    });
+                  });
+                };
+                listing.find("input.create").unbind("click").click(function() {
+                  with_html(function(html) {
+                    var embed = parseTemplate($("#widget_embed").html(), {
+                      id: new Date().getTime(),
+                      content: escape(html)
+                    });
+                    listing.find("textarea.embed").val(embed);
+                    listing.find("div.preview").empty().append(embed);
+                  });
+                  return false;
                 });
               };
-              listing.find("input.create").click(function() {
-                with_html(function(html) {
-                  var embed = parseTemplate($("#widget_embed").html(), {
-                    id: new Date().getTime(),
-                    content: escape(html)
-                  });
-                  listing.find("textarea").val(embed);
-                  listing.find("div.preview").empty().append(embed);
-                });
-                return false;
-              });
+              listing.find("textarea.source").keyup(update_listing).keyup();
             });
+          }
         });
       });
     });
   });
+  function parse_widget(html) {
+    var results = "";
+    var config = "";
+    HTMLParser(html, {
+      start: function( tag, attrs, unary ) {
+        var src = $.grep(attrs, function(attr) { return attr.name == "src" } )[0];
+        var id = $.grep(attrs, function(attr) { return attr.name == "id" } )[0];
+        if (tag == "script" && src && !src.value.match(/^http/)) {
+          this.chars = $.noop;
+          this.end = $.noop;
+        } else if (tag == "script" && id && id.value == "config") {
+          this.chars = function(text) {
+            config = text;
+            results += MARKER;
+            this.chars = $.noop;
+          };
+          this.end = $.noop;
+        } else {
+          this.chars = function(text) { results += text; };
+          this.end = function(tag) { results += "</" + tag + ">"; };
+          results += "<" + tag;
+          for ( var i = 0; i < attrs.length; i++ )
+            results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
+          results += (unary ? "/" : "") + ">";
+        }
+      }
+    });
+    return [results, config];
+  }
 </script>
 <script id="config_t" type="text/html">
   <script id="config">
@@ -110,21 +125,22 @@
   <div class="listing">
     <h3><#= name #></h3>
     <form>
-      <#= params #>
-      <input class="create" value="Create" type="submit" />
+      <div><textarea class="source"><#= source #></textarea></div>
+      <div class="params" />
+      <div><input class="create" value="Widgetize" type="submit" /></div>
+      <div><textarea class="embed"></textarea></div>
     </form>
     <div class="preview" />
-    <textarea class="embed"></textarea>
   </div>
 </script>
 <script id="widget_embed" type="text/html">
-  <iframe style="width: 520px; height: 300px; border: 0" frameborder="no" id="<#= id #>" />
-  <script>
-    var doc = document.getElementById("<#= id #>").contentWindow.document;
-    doc.open();
-    doc.write(unescape("<#= content #>"));
-    doc.close();
-  </<#= "script"#>>
+<iframe style="width: 520px; height: 300px; border: 0" frameborder="no" id="<#= id #>" />
+<script>
+var doc = document.getElementById("<#= id #>").contentWindow.document;
+doc.open();
+doc.write(unescape("<#= content #>"));
+doc.close();
+</<#= "script"#>>
 </script>
 <body>
   <div id="results"></div>
