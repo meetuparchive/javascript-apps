@@ -79,12 +79,12 @@
               };
               listing.find("input.create").click(function() {
                 with_html(function(html) {
-                  var iframe = $('<iframe style="width: 520px; height: 300px; border: 0" frameborder="no" />');
-                  listing.find("div.frametarget").empty().append(iframe);
-                  var doc = iframe[0].contentWindow.document;
-                  doc.open();
-                  doc.write(html);
-                  doc.close();
+                  var embed = parseTemplate($("#widget_embed").html(), {
+                    id: new Date().getTime(),
+                    content: escape(html)
+                  });
+                  listing.find("textarea").val(embed);
+                  listing.find("div.preview").empty().append(embed);
                 });
                 return false;
               });
@@ -113,8 +113,18 @@
       <#= params #>
       <input class="create" value="Create" type="submit" />
     </form>
-    <div class="frametarget" />
+    <div class="preview" />
+    <textarea class="embed"></textarea>
   </div>
+</script>
+<script id="widget_embed" type="text/html">
+  <iframe style="width: 520px; height: 300px; border: 0" frameborder="no" id="<#= id #>" />
+  <script>
+    var doc = document.getElementById("<#= id #>").contentWindow.document;
+    doc.open();
+    doc.write(unescape("<#= content #>"));
+    doc.close();
+  </<#= "script"#>>
 </script>
 <body>
   <div id="results"></div>
