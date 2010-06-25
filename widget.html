@@ -43,7 +43,9 @@
                   }
                 }
               });
-              var api_call = function() { alert("crap"); };
+              var api_call = function(path, params) {
+                return "http://api.meetup.com/" + path + "?callback=?&" + $.param($.extend({ key: $api_key, sign: true }, params));
+              };
               eval(config);
               var params = "";
               for (name in $parameters) {
@@ -58,26 +60,20 @@
                 listing.find("input.param").each(function() {
                   parameters[this.name] = $(this).val();
                 });
-                var queries = {};
                 var lookups = 0;
                 for (i in $queries) { lookups++; }
-                $.each($queries, function(name, value) {
-                  api_call = function(path, params) {
-                    $.getJSON(
-                      "http://api.meetup.com/" + path + "?callback=?", $.extend({ key: $api_key, sign: true }, params),
-                      function(data) {
-                        queries[name] = data.meta.signed_url.replace(/&callback=[^&]+/, '');
-                        lookups--;
-                        if (lookups == 0) {
-                          block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
-                            params: JSON.stringify(parameters),
-                            queries: JSON.stringify(queries)
-                          })));
-                        }
-                      }
-                    );
-                  };
-                  value();
+                var query_ary = [];
+                $.each($queries, function(name, query) {
+                  $.getJSON(query(), function(data) {
+                    var query = data.meta.signed_url.replace(/&callback=[^&]+/, '&callback=?');
+                    query_ary.push(name + ": function() { return \"" + query + "\"; }");
+                    if (query_ary.length == lookups) {
+                      block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
+                        params: JSON.stringify(parameters),
+                        queries: query_ary.join(", ")
+                      })));
+                    }
+                  });
                 });
               };
               listing.find("input.create").click(function() {
@@ -93,7 +89,7 @@
 <script id="config_t" type="text/html">
   <script id="config">
     $parameters = <#= params #>;
-    $queries = <#= queries #>;
+    $queries = { <#= queries #> };
   </<#= "script"#>>
 </script>
 <script id="parameter" type="text/html">
