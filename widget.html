@@ -22,7 +22,7 @@
           if (item.name.match(/.html$/)) {
             $.getJSON(github + "blob/show/meetup/" + widgetrepo + "/" + head + "/" + item.name + cbq, function(json) {
               var listing = $(parseTemplate($("#listing").html(), { 
-                name: json.blob.name,
+                name: json.blob.name.replace(/.html$/, ""),
                 source: json.blob.data
               }));
               $("#results").append(listing);
@@ -36,6 +36,8 @@
                 };
                 eval(config);
                 var params = "";
+                if ($parameters._name) listing.find("h3.name").text($parameters._name);
+                if ($parameters._description) listing.find("div.description").text($parameters._description);
                 for (name in $parameters) {
                   if (name[0] != "_")
                     params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
@@ -126,7 +128,8 @@
 </script>
 <script id="listing" type="text/html">
   <div class="listing">
-    <h3><#= name #></h3>
+    <h3 class="name"><#= name #></h3>
+    <div class="description" />
     <form>
       <div><textarea class="source"><#= source #></textarea></div>
       <div class="params" />
