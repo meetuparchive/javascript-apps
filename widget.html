@@ -52,13 +52,14 @@
                 params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
               }
               var listing = $(parseTemplate($("#listing").html(), { 
-                name: json.blob.name, params: params, body: results
+                name: json.blob.name, 
+                params: params, 
+                body: results
               }));
               $("#results").append(listing);
               var with_html = function(block) {
-                var parameters = {};
                 listing.find("input.param").each(function() {
-                  parameters[this.name] = $(this).val();
+                  $parameters[this.name] = $(this).val();
                 });
                 var lookups = 0;
                 for (i in $queries) { lookups++; }
@@ -69,7 +70,7 @@
                     query_ary.push(name + ": function() { return \"" + query + "\"; }");
                     if (query_ary.length == lookups) {
                       block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
-                        params: JSON.stringify(parameters),
+                        params: JSON.stringify($parameters),
                         queries: query_ary.join(", ")
                       })));
                     }
@@ -77,7 +78,14 @@
                 });
               };
               listing.find("input.create").click(function() {
-                with_html(function(html) { alert(html); });
+                with_html(function(html) {
+                  var iframe = $('<iframe style="width: 520px; height: 300px; border: 0" frameborder="no" />');
+                  listing.find("div.frametarget").empty().append(iframe);
+                  var doc = iframe[0].contentWindow.document;
+                  doc.open();
+                  doc.write(html);
+                  doc.close();
+                });
                 return false;
               });
             });
@@ -88,8 +96,8 @@
 </script>
 <script id="config_t" type="text/html">
   <script id="config">
-    $parameters = <#= params #>;
-    $queries = { <#= queries #> };
+    var $parameters = <#= params #>;
+    var $queries = { <#= queries #> };
   </<#= "script"#>>
 </script>
 <script id="parameter" type="text/html">
@@ -99,11 +107,14 @@
   </div>
 </script>
 <script id="listing" type="text/html">
-  <h3><#= name #></h3>
-  <form>
-    <#= params #>
-    <input class="create" value="Create" type="submit" />
-  </form>
+  <div class="listing">
+    <h3><#= name #></h3>
+    <form>
+      <#= params #>
+      <input class="create" value="Create" type="submit" />
+    </form>
+    <div class="frametarget" />
+  </div>
 </script>
 <body>
   <div id="results"></div>
