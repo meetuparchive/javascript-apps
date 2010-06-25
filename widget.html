@@ -37,7 +37,8 @@
                 eval(config);
                 var params = "";
                 for (name in $parameters) {
-                  params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
+                  if (name[0] != "_")
+                    params += parseTemplate($("#parameter").html(), { name: name, value: $parameters[name] });
                 }
                 listing.find("div.params").empty().append(params);
                 var with_html = function(block) {
@@ -64,7 +65,9 @@
                   with_html(function(html) {
                     var embed = parseTemplate($("#widget_embed").html(), {
                       id: new Date().getTime(),
-                      content: escape(html)
+                      content: escape(html),
+                      width: $parameters.width || $parameters._width || "500",
+                      height: $parameters.height || $parameters._height || "250",
                     });
                     listing.find("textarea.embed").val(embed);
                     listing.find("div.preview").empty().append(embed);
@@ -134,7 +137,7 @@
   </div>
 </script>
 <script id="widget_embed" type="text/html">
-<iframe style="width: 520px; height: 300px; border: 0" frameborder="no" id="<#= id #>" />
+<iframe style="width: <#= width #>px; height: <#= height #>px; border: 0" frameborder="no" id="<#= id #>" />
 <script>
 var doc = document.getElementById("<#= id #>").contentWindow.document;
 doc.open();
