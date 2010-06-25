@@ -6,9 +6,6 @@
 <script src="json2.js"></script>
 <script src="api_key.js"></script>
 <script>
-  function api_call(path, params) {
-    return "http://api.meetup.com/" + path + "?callback=?&" + $.param($.extend({ key: $api_key, sign: true }, params));
-  }
   var github = "http://github.com/api/v2/json/";
   var widgetrepo = "widgets";
   var cbq = "?callback=?";
@@ -38,7 +35,7 @@
                     this.end = $.noop;
                   } else {
                     this.chars = function(text) { results += text; };
-                    this.end = function( tag ) { results += "</" + tag + ">"; };
+                    this.end = function(tag) { results += "</" + tag + ">"; };
                     results += "<" + tag;
                     for ( var i = 0; i < attrs.length; i++ )
                       results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
@@ -46,6 +43,7 @@
                   }
                 }
               });
+              var api_call = function() { alert("crap"); };
               eval(config);
               var params = "";
               for (name in $parameters) {
@@ -55,15 +53,37 @@
                 name: json.blob.name, params: params, body: results
               }));
               $("#results").append(listing);
-              var sync = function() {
-                $parameters[this.name] = $(this).val();
-                listing.find("textarea").val(
-                  results.replace(MARKER, parseTemplate($("#config_t").html(), { 
-                    params: JSON.stringify($parameters)
-                  }))
-                );
+              var with_html = function(block) {
+                var parameters = {};
+                listing.find("input.param").each(function() {
+                  parameters[this.name] = $(this).val();
+                });
+                var queries = {};
+                var lookups = 0;
+                for (i in $queries) { lookups++; }
+                $.each($queries, function(name, value) {
+                  api_call = function(path, params) {
+                    $.getJSON(
+                      "http://api.meetup.com/" + path + "?callback=?", $.extend({ key: $api_key, sign: true }, params),
+                      function(data) {
+                        queries[name] = data.meta.signed_url.replace(/&callback=[^&]+/, '');
+                        lookups--;
+                        if (lookups == 0) {
+                          block(results.replace(MARKER, parseTemplate($("#config_t").html(), { 
+                            params: JSON.stringify(parameters),
+                            queries: JSON.stringify(queries)
+                          })));
+                        }
+                      }
+                    );
+                  };
+                  value();
+                });
               };
-              listing.find("input.param").keyup(sync).each(sync);
+              listing.find("input.create").click(function() {
+                with_html(function(html) { alert(html); });
+                return false;
+              });
             });
         });
       });
@@ -73,6 +93,7 @@
 <script id="config_t" type="text/html">
   <script id="config">
     $parameters = <#= params #>;
+    $queries = <#= queries #>;
   </<#= "script"#>>
 </script>
 <script id="parameter" type="text/html">
@@ -85,7 +106,7 @@
   <h3><#= name #></h3>
   <form>
     <#= params #>
-    <textarea></textarea> 
+    <input class="create" value="Create" type="submit" />
   </form>
 </script>
 <body>
