@@ -1,8 +1,8 @@
 <html>
 <head>
 <style>
+  textarea.source { display: none; }
   textarea { width: 40em; height: 20em };
-  
 </style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script src="template.js"></script>
@@ -77,6 +77,10 @@
                   return false;
                 });
               };
+              listing.find("a.view-source").click(function() {
+                listing.find("textarea.source").slideToggle();
+                return false;
+              });
               listing.find("textarea.source").keyup(update_listing).keyup();
             });
           }
@@ -131,6 +135,7 @@
     <h3 class="name"><#= name #></h3>
     <div class="description" />
     <form>
+      <a class="view-source" href="#">View &amp; Edit Source</a>
       <div><textarea class="source"><#= source #></textarea></div>
       <div class="params" />
       <div><input class="create" value="Widgetize" type="submit" /></div>
