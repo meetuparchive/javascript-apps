@@ -21,12 +21,12 @@
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
       // signed Everywhere Events query, parameters can't be altered:
-      var ew_query = 'http://api.meetup.com/ew/events?status=upcoming%2Cpast&radius=25.0&order=time&urlname=scala&offset=0&format=json&page=200&sig_id=7230113&sig=b700c95ce6c104f7df51527056bd0e72&callback=?';
+      var ew_query = 'http://api.meetup.com/ew/events?status=upcoming&radius=25.0&order=time&urlname=rally4sanity&offset=0&format=json&page=200&sig_id=7230113&sig=2c1a198b5d2351c145c9ef7a4e5e0618f64ee6cf&callback=?';
       with_each(ew_query, function(i, ev) {
-        pin(ev, ev.city + ' Scala Meetup', ev.time, ev.meetup_url);
+        pin(ev, ev.city + ' Rally for Sanity', ev.time, ev.meetup_url);
       });
       // signed events v2 topic query, can't be altered:
-      var gr_query = 'http://api.meetup.com/2/events?radius=25.0&topic=scala&offset=0&format=json&page=200&after=0d&sig_id=7230113&sig=cecfef2bea83dd193511408f6015c259&callback=?';
+      var gr_query = 'http://api.meetup.com/2/open_events?status=upcoming&radius=25.0&topic=tea-party&desc=False&offset=0&format=json&page=200&sig_id=7230113&sig=e23ba8c8772592143a240769c70cc518246ceaa2&callback=?';
       with_each(gr_query, function(i, ev) {
         var loc = typeof ev.venue == 'undefined' ? ev : ev.venue;
         pin(loc, ev.group.name, ev.time, ev.event_url);
